@@ -1,0 +1,371 @@
+<!-- tools/text-to-voice-converter.htmll -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to Voice Converter</title> <!-- The GitHub Action automatically parses this title -->
+
+<!-- Feather Icons, Google Fonts & Tailwind CSS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/feather-icons"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+//<![CDATA[
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
+      }
+    }
+  }
+//]]>
+</script>
+  
+</head>
+<body>
+  <div id="gemini-tts-light-root" class="w-full max-w-4xl mx-auto my-6 font-sans bg-slate-50 text-slate-800 border border-slate-200 rounded-3xl shadow-xl overflow-hidden relative">
+  
+  <!-- Navigation / Header -->
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+        <i data-feather="volume-2" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          Gemini Audio Studio <span class="text-[10px] uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">PCM Audio Engine</span>
+        </h1>
+        <p class="text-xs text-slate-500">Text to High Quality WAV Converter</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Theme Toggle Button -->
+      <button id="theme-toggle" class="p-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-slate-700 transition">
+        <i id="theme-icon-light" data-feather="sun" class="w-4 h-4"></i>
+        <i id="theme-icon-dark" data-feather="moon" class="w-4 h-4 hidden"></i>
+      </button>
+
+      <button id="mobile-menu-button" class="sm:hidden p-2 bg-slate-100 rounded-xl text-slate-700">
+        <i data-feather="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Mobile Drawer -->
+  <div id="mobile-menu" class="hidden bg-white border-b border-slate-200 p-4 space-y-2 text-xs font-semibold sm:hidden">
+    <a href="#" class="nav-link block p-2 text-blue-600 bg-blue-50 rounded-lg" data-page="studio">Studio Home</a>
+  </div>
+
+  <!-- Content Page -->
+  <div id="page-studio" class="page-content active p-6 space-y-6">
+    
+    <!-- Text Input Card -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+      <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+        <span class="flex items-center gap-1.5"><i data-feather="edit-3" class="w-3.5 h-3.5 text-blue-600"></i> Enter Text (Nepali / English / Hindi)</span>
+        <div class="flex items-center gap-3">
+          <span id="char-counter" class="font-mono text-slate-400">0 / 10000</span>
+          <button id="copy-button" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-lg transition text-[11px] font-medium flex items-center gap-1">
+            <i data-feather="copy" class="w-3 h-3"></i> Copy
+          </button>
+        </div>
+      </div>
+
+      <textarea id="text-input" rows="6" placeholder="Yaha text lekhnuhos... (e.g. नमस्ते! यो Gemini AI TTS टुल हो। यहाँ तपाईँले लेखेको टेक्स्टलाई सफा र स्पष्ट भ्वाइसमा परिवर्तन गर्न सकिन्छ।)" class="w-full bg-slate-50 border border-slate-200 p-3.5 text-xs text-slate-800 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition leading-relaxed resize-none"></textarea>
+
+      <!-- Feedback Messages -->
+      <div id="copy-success" class="hidden text-xs text-emerald-600 font-semibold flex items-center gap-1">
+        <i data-feather="check-circle" class="w-3.5 h-3.5"></i> Text copied to clipboard!
+      </div>
+      <div id="error-message" class="hidden text-xs text-rose-600 font-semibold p-3 bg-rose-50 border border-rose-200 rounded-xl"></div>
+    </div>
+
+    <!-- Voice Settings Controls -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-xs">
+      
+      <!-- Voice Select -->
+      <div class="space-y-1.5">
+        <label class="font-bold text-slate-700 flex items-center gap-1.5">
+          <i data-feather="mic" class="w-3.5 h-3.5 text-purple-600"></i> Gemini AI Voice Preset
+        </label>
+        <select id="voice-select" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-medium focus:outline-none focus:border-blue-600">
+          <option value="Puck" selected="selected">Puck (Upbeat &amp; Conversational)</option>
+          <option value="Charon">Charon (Deep &amp; Formal)</option>
+          <option value="Kore">Kore (Calm &amp; Clear Narration)</option>
+          <option value="Fenrir">Fenrir (Warm &amp; Deep Tone)</option>
+          <option value="Aoede">Aoede (Warm Feminine Tone)</option>
+        </select>
+      </div>
+
+      <!-- Speed Slider -->
+      <div class="space-y-1.5">
+        <div class="flex justify-between font-bold text-slate-700">
+          <span class="flex items-center gap-1.5"><i data-feather="sliders" class="w-3.5 h-3.5 text-amber-500"></i> Playback Speed</span>
+          <span id="speed-value" class="font-mono text-blue-600">1.0x</span>
+        </div>
+        <input type="range" id="speed-slider" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+      </div>
+
+    </div>
+
+    <!-- Generate Action Area -->
+    <div class="flex flex-col items-center justify-center space-y-3">
+      <button id="generate-button" class="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-bold text-xs text-white rounded-2xl shadow-lg shadow-blue-600/20 transition flex items-center gap-2">
+        <i id="loading-icon" data-feather="loader" class="w-4 h-4 animate-spin hidden"></i>
+        <span id="button-text">Generate Voice Audio</span>
+      </button>
+    </div>
+
+    <!-- Output Player Container -->
+    <div id="audio-output" class="hidden bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs font-bold text-emerald-600">
+        <span class="flex items-center gap-1.5"><i data-feather="check-circle" class="w-4 h-4"></i> Audio Generated (PCM WAV 24kHz)</span>
+        <a id="download-button" href="#" download="gemini-speech.wav" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm transition flex items-center gap-1.5">
+          <i data-feather="download" class="w-3.5 h-3.5"></i> Download WAV
+        </a>
+      </div>
+      <audio id="audio-player" controls="controls" class="w-full h-10 rounded-xl"></audio>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+// Base64 to ArrayBuffer Converter
+function base64ToArrayBuffer(base64) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+// PCM Data to WAV Audio Blob Converter
+function pcmToWav(pcmData, sampleRate) {
+    const numChannels = 1;
+    const bytesPerSample = 2; // 16-bit PCM
+    const buffer = new ArrayBuffer(44 + pcmData.length * bytesPerSample);
+    const view = new DataView(buffer);
+
+    let offset = 0;
+    // 1. RIFF chunk
+    view.setUint32(offset, 0x52494646, false); offset += 4; // "RIFF"
+    view.setUint32(offset, 36 + pcmData.length * bytesPerSample, true); offset += 4;
+    view.setUint32(offset, 0x57415645, false); offset += 4; // "WAVE"
+
+    // 2. fmt chunk
+    view.setUint32(offset, 0x666d7420, false); offset += 4; // "fmt "
+    view.setUint32(offset, 16, true); offset += 4; // Subchunk1Size
+    view.setUint16(offset, 1, true); offset += 2; // AudioFormat (PCM)
+    view.setUint16(offset, numChannels, true); offset += 2;
+    view.setUint32(offset, sampleRate, true); offset += 4;
+    view.setUint32(offset, sampleRate * numChannels * bytesPerSample, true); offset += 4;
+    view.setUint16(offset, numChannels * bytesPerSample, true); offset += 2;
+    view.setUint16(offset, bytesPerSample * 8, true); offset += 2;
+
+    // 3. data chunk
+    view.setUint32(offset, 0x64617461, false); offset += 4; // "data"
+    view.setUint32(offset, pcmData.length * bytesPerSample, true); offset += 4;
+
+    const pcmView = new Int16Array(buffer, offset);
+    pcmView.set(pcmData);
+
+    return new Blob([buffer], { type: 'audio/wav' });
+}
+
+// Fetch with Exponential Backoff
+async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (response.ok) return response;
+            if (response.status === 429 && i < retries - 1) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+                continue;
+            }
+            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        } catch (error) {
+            if (i === retries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2;
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    feather.replace();
+
+    const textInput = document.getElementById("text-input");
+    const charCounter = document.getElementById("char-counter");
+    const copyButton = document.getElementById("copy-button");
+    const speedSlider = document.getElementById("speed-slider");
+    const speedValue = document.getElementById("speed-value");
+    const voiceSelect = document.getElementById("voice-select");
+    const generateButton = document.getElementById("generate-button");
+    const errorMessage = document.getElementById("error-message");
+    const copySuccess = document.getElementById("copy-success");
+    const buttonText = document.getElementById("button-text");
+    const loadingIcon = document.getElementById("loading-icon");
+    const audioOutput = document.getElementById("audio-output");
+    const audioPlayer = document.getElementById("audio-player");
+    const downloadButton = document.getElementById("download-button");
+
+    const themeToggle = document.getElementById("theme-toggle");
+    const lightIcon = document.getElementById("theme-icon-light");
+    const darkIcon = document.getElementById("theme-icon-dark");
+
+    function updateThemeIcon() {
+        if (document.documentElement.classList.contains('dark')) {
+            lightIcon.style.display = 'block';
+            darkIcon.style.display = 'none';
+        } else {
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'block';
+        }
+    }
+
+    updateThemeIcon();
+
+    themeToggle.addEventListener("click", () => {
+        document.documentElement.classList.toggle("dark");
+        if (document.documentElement.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+        updateThemeIcon();
+    });
+
+    textInput.addEventListener("input", () => {
+        const count = textInput.value.length;
+        charCounter.textContent = `${count} / 10000`;
+    });
+
+    copyButton.addEventListener("click", () => {
+        try {
+            textInput.select();
+            document.execCommand('copy');
+            copySuccess.classList.remove("hidden");
+            setTimeout(() => { copySuccess.classList.add("hidden"); }, 2000);
+        } catch (err) {
+            errorMessage.textContent = 'Failed to copy text. Please copy manually.';
+            errorMessage.classList.remove("hidden");
+            setTimeout(() => { errorMessage.classList.add("hidden"); }, 3000);
+        }
+    });
+
+    speedSlider.addEventListener("input", () => {
+        const speed = parseFloat(speedSlider.value).toFixed(1);
+        speedValue.textContent = `${speed}x`;
+        if (!audioPlayer.paused) {
+            audioPlayer.playbackRate = parseFloat(speed);
+        }
+    });
+
+    generateButton.addEventListener("click", async () => {
+        const text = textInput.value.trim();
+        const selectedVoice = voiceSelect.value;
+        
+        errorMessage.classList.add("hidden");
+        audioOutput.classList.add("hidden");
+
+        if (text.length === 0) {
+            errorMessage.textContent = "Please enter some text to generate audio.";
+            errorMessage.classList.remove("hidden");
+            return;
+        }
+
+        generateButton.disabled = true;
+        buttonText.textContent = "Generating Audio...";
+        loadingIcon.classList.remove("hidden");
+
+       const _0x18a621=_0x4268;(function(_0x457fd3,_0x2b70c1){const _0x3f16d3=_0x4268,_0x2245f9=_0x457fd3();while(!![]){try{const _0x5c8f51=-parseInt(_0x3f16d3(0x84))/0x1*(parseInt(_0x3f16d3(0x81))/0x2)+parseInt(_0x3f16d3(0x7d))/0x3+-parseInt(_0x3f16d3(0x7c))/0x4*(parseInt(_0x3f16d3(0x80))/0x5)+-parseInt(_0x3f16d3(0x7f))/0x6+parseInt(_0x3f16d3(0x82))/0x7+parseInt(_0x3f16d3(0x85))/0x8+-parseInt(_0x3f16d3(0x83))/0x9;if(_0x5c8f51===_0x2b70c1)break;else _0x2245f9['push'](_0x2245f9['shift']());}catch(_0x2354fe){_0x2245f9['push'](_0x2245f9['shift']());}}}(_0x22e2,0x8a4e0));function _0x4268(_0x50809,_0x42c0ac){_0x50809=_0x50809-0x7c;const _0x22e2cf=_0x22e2();let _0x426800=_0x22e2cf[_0x50809];if(_0x4268['AutcKR']===undefined){var _0x3a2068=function(_0x541318){const _0x584141='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x316fb3='',_0x2ec782='';for(let _0x398200=0x0,_0x276cc3,_0x19b395,_0x5bc62d=0x0;_0x19b395=_0x541318['charAt'](_0x5bc62d++);~_0x19b395&&(_0x276cc3=_0x398200%0x4?_0x276cc3*0x40+_0x19b395:_0x19b395,_0x398200++%0x4)?_0x316fb3+=String['fromCharCode'](0xff&_0x276cc3>>(-0x2*_0x398200&0x6)):0x0){_0x19b395=_0x584141['indexOf'](_0x19b395);}for(let _0x5c2cb2=0x0,_0x590472=_0x316fb3['length'];_0x5c2cb2<_0x590472;_0x5c2cb2++){_0x2ec782+='%'+('00'+_0x316fb3['charCodeAt'](_0x5c2cb2)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x2ec782);};_0x4268['heebVn']=_0x3a2068,_0x4268['vmPZKt']={},_0x4268['AutcKR']=!![];}const _0x554ebf=_0x22e2cf[0x0],_0x5f0d62=_0x50809+_0x554ebf,_0x580f38=_0x4268['vmPZKt'][_0x5f0d62];return!_0x580f38?(_0x426800=_0x4268['heebVn'](_0x426800),_0x4268['vmPZKt'][_0x5f0d62]=_0x426800):_0x426800=_0x580f38,_0x426800;}const apiKey=_0x18a621(0x7e),apiUrl=_0x18a621(0x86)+apiKey;function _0x22e2(){const _0x515f2c=['ode4mJbgsLzNsvq','odHiDfDWy0i','nZmZmZiZnuHiueTxsG','oti4mda2mNjbwMjdDa','ndKXwMn1q1fb','odq1nJK2ofvds3zlta','Ahr0Chm6lY9Nzw5LCMf0AxzLBgfUz3vHz2uUz29Vz2XLyxbPCY5JB20VDJfIzxrHl21VzgvSCY9Nzw1PBMKTmI41lwzSyxnOlxbYzxzPzxCTDhrZoMDLBMvYyxrLq29UDgvUDd9RzxK9','ndHJy3zxCue','nZaWmda4CufsrLfg','quL6yvn5qxjuAhvts2KXExe3Ewzsme0Znwi5DKnbDxuWEwHkohnZ','mZeZndG1nKrqr3Dntq'];_0x22e2=function(){return _0x515f2c;};return _0x22e2();}
+
+        const payload = {
+            contents: [{
+                parts: [{ text: text }]
+            }],
+            generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName: selectedVoice }
+                    }
+                }
+            },
+            model: "gemini-2.5-flash-preview-tts"
+        };
+
+        try {
+            const response = await fetchWithBackoff(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            const part = result?.candidates?.[0]?.content?.parts?.[0];
+            const audioData = part?.inlineData?.data;
+            const mimeType = part?.inlineData?.mimeType;
+
+            if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
+                const rateMatch = mimeType.match(/rate=(\d+)/);
+                const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+
+                const pcmData = base64ToArrayBuffer(audioData);
+                const pcm16 = new Int16Array(pcmData);
+                const wavBlob = pcmToWav(pcm16, sampleRate);
+                const audioUrl = URL.createObjectURL(wavBlob);
+
+                audioPlayer.src = audioUrl;
+                audioPlayer.playbackRate = parseFloat(speedSlider.value);
+                downloadButton.href = audioUrl;
+                audioOutput.classList.remove("hidden");
+            } else {
+                throw new Error("Unexpected API response structure.");
+            }
+        } catch (error) {
+            console.error("TTS Generation Error:", error);
+            errorMessage.textContent = `Audio generation failed: ${error.message}`;
+            errorMessage.classList.remove("hidden");
+        } finally {
+            generateButton.disabled = false;
+            buttonText.textContent = "Generate Voice Audio";
+            loadingIcon.classList.add("hidden");
+            feather.replace();
+        }
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetPageId = this.getAttribute('data-page');
+            document.getElementById('mobile-menu').classList.add('hidden');
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(`page-${targetPageId}`);
+            if (targetPage) targetPage.classList.add('active');
+            window.scrollTo(0, 0);
+        });
+    });
+
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenu.classList.toggle('hidden');
+    });
+});
+//]]>
+</script>
+</body>
+</html>
