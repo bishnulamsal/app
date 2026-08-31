@@ -1,63 +1,63 @@
 [
   {
     "title": "Photography Live Simulator",
-    "desc": "Static web application tool.",
+    "desc": "Photography Live Simulator · All effects rendered on real photo · No data collected.",
     "url": "tools/depth-of-field-simulator.html",
-    "icon": "⚡",
-    "tag": "Utility"
+    "icon": "📷",
+    "tag": "Photography"
   },
   {
     "title": "Dork Search - Search Everything",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/everything-search.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
-    "title": "Index",
-    "desc": "Static web application tool.",
+    "title": "Page Not Found - Redirecting...",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/index.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
     "title": "BTV Nepal — Live TV",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/iptv-bishnulamsal-tv.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
     "title": "Plus UI Studio v4.0 - Advanced Blogger Thumbnail Generator",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/post-thumbnail-generator.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
     "title": "Preeti ⇄ Unicode — नेपाली फन्ट कन्भर्टर",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/preeti-to-unicode-converter.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
     "title": "Roman ⇄ Unicode — नेपाली फन्ट कन्भर्टर",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/roman-to-unicode-converter.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
     "title": "Text to Voice Converter",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/text-to-voice-converter.html",
     "icon": "⚡",
     "tag": "Utility"
   },
   {
     "title": "Unicode ⇄ Preeti — नेपाली फन्ट कन्भर्टर",
-    "desc": "Static web application tool.",
+    "desc": "Fast and lightweight client-side web application.",
     "url": "tools/unicode-to-preeti-converter.html",
     "icon": "⚡",
     "tag": "Utility"
