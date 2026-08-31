@@ -1,0 +1,85 @@
+name: Auto-update tools.json
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tools/**'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate tools.json
+        run: |
+          python -c "
+          import os, json, re
+
+          tools_dir = 'tools'
+          existing_tools = {}
+
+          # Read existing metadata if tools.json exists
+          if os.path.exists('tools.json'):
+              try:
+                  with open('tools.json', 'r', encoding='utf-8') as f:
+                      for item in json.load(f):
+                          existing_tools[item.get('url')] = item
+              except Exception as e:
+                  print('Could not read existing tools.json:', e)
+
+          updated_tools = []
+
+          if os.path.exists(tools_dir):
+              for filename in sorted(os.listdir(tools_dir)):
+                  if filename.endswith('.html'):
+                      rel_path = f'{tools_dir}/{filename}'
+                      
+                      # Retain custom description/icon if already set in tools.json
+                      old_data = existing_tools.get(rel_path, {})
+                      
+                      # Auto-format title from filename: 'unicode-converter.html' -> 'Unicode Converter'
+                      clean_name = os.path.splitext(filename)[0].replace('-', ' ').replace('_', ' ').title()
+
+                      # Extract <title> tag text if present inside the HTML file
+                      try:
+                          with open(rel_path, 'r', encoding='utf-8') as hf:
+                              content = hf.read()
+                              match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE)
+                              if match:
+                                  clean_name = match.group(1).strip()
+                      except Exception:
+                          pass
+
+                      tool_entry = {
+                          'title': old_data.get('title', clean_name),
+                          'desc': old_data.get('desc', 'Static web application tool.'),
+                          'url': rel_path,
+                          'icon': old_data.get('icon', '⚡'),
+                          'tag': old_data.get('tag', 'Utility')
+                      }
+                      updated_tools.append(tool_entry)
+
+          with open('tools.json', 'w', encoding='utf-8') as f:
+              json.dump(updated_tools, f, indent=2, ensure_ascii=False)
+          "
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add tools.json
+          
+          # Only commit if changes were made to tools.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-update tools.json [skip ci]" && git push)
