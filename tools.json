@@ -1,15 +1,15 @@
 [
   {
-    "title": "Nepali Unicode Converter",
-    "desc": "Easily convert Romanized Nepali text to Nepali Unicode script instantly.",
-    "url": "tools/unicode.html",
+    "title": "Post Thumbnail Generator",
+    "desc": "Easily Create Post Thumbnail for blog post.",
+    "url": "/post-thumbnail-generator.html",
     "icon": "📝",
     "tag": "Converter"
   },
   {
-    "title": "URL Shortener Tool",
+    "title": "Unicode to Preeti converter",
     "desc": "Create fast and custom lightweight short links dynamically.",
-    "url": "tools/url-shortener.html",
+    "url": "/preeti-to-unicode-converter.html",
     "icon": "🔗",
     "tag": "Utility"
   }
