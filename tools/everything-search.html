@@ -1,0 +1,650 @@
+<!-- tools/my-new-tool.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dork Search - Search Everything </title> <!-- The GitHub Action automatically parses this title -->
+
+<!-- Google Fonts, FontAwesome & Tailwind CSS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { 
+          sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace']
+        }
+      }
+    }
+  }
+</script>
+
+  
+</head>
+<body>
+  <div id="dork-studio-root" class="w-full max-w-5xl mx-auto my-6 font-sans bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden relative transition-colors duration-300">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-100px] opacity-0 transition-all duration-300 ease-out bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600 text-sm"></i>
+    <span id="toastMsg">Action completed</span>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 ring-4 ring-blue-50 dark:ring-slate-800">
+        <i class="fa-solid fa-terminal text-lg animate-pulse"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 tracking-tight">
+          Direct Directory & File Finder
+          <span class="text-[10px] uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800">OSINT Suite</span>
+        </h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Server Indexes • Torrent P2P • Cloud Storage • Filters</p>
+      </div>
+    </div>
+
+    <!-- Header Actions (Theme & Anti-Spam) -->
+    <div class="flex items-center gap-2">
+      <button id="btnThemeToggle" type="button" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+        <i id="themeIcon" class="fa-solid fa-moon text-indigo-500"></i>
+        <span id="themeLabel" class="hidden sm:inline">Dark</span>
+      </button>
+
+      <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-3.5 py-1.5 rounded-xl">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        <i class="fa-solid fa-shield-halved"></i> Active
+      </div>
+    </div>
+  </header>
+
+  <div class="p-6 space-y-6">
+
+    <!-- Quick Search Presets -->
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Quick Presets
+        </label>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs">
+        <button type="button" class="preset-btn px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs rounded-xl text-slate-700 dark:text-slate-200 font-semibold transition" data-keyword="Avatar" data-cat="movies">
+          🎬 <span>Movies</span>
+        </button>
+        <button type="button" class="preset-btn px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs rounded-xl text-slate-700 dark:text-slate-200 font-semibold transition" data-keyword="Python Programming" data-cat="pdf_books">
+          📚 <span>Books & PDFs</span>
+        </button>
+        <button type="button" class="preset-btn px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs rounded-xl text-slate-700 dark:text-slate-200 font-semibold transition" data-keyword="Loksewa Tayari" data-cat="cloud_storage">
+          ☁️ <span>Loksewa (Cloud)</span>
+        </button>
+
+        <!-- New Torrent Preset -->
+        <button type="button" class="preset-btn px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs rounded-xl text-slate-700 dark:text-slate-200 font-semibold transition" data-keyword="Ubuntu 24.04" data-cat="torrents">
+          🧲 <span>Torrents & P2P</span>
+        </button>
+
+        <button type="button" class="preset-btn px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs rounded-xl text-slate-700 dark:text-slate-200 font-semibold transition" data-keyword="Photoshop 2024" data-cat="software">
+          💻 <span>Apps / Games</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Keyword Input Area -->
+    <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-2">
+      <div class="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-magnifying-glass text-blue-600 dark:text-blue-400"></i> Search Keyword</span>
+        <span class="text-[10px] text-slate-400 font-normal">Press <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded font-mono text-[9px] text-slate-600 dark:text-slate-300">Enter</kbd> to search</span>
+      </div>
+      <div class="flex gap-2">
+        <div class="relative w-full">
+          <input type="text" id="mainQuery" placeholder="e.g. Interstellar, Machine Learning, Photoshop..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 pl-3.5 pr-9 py-3 text-xs text-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500">
+          <button id="btnClear" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-6 h-6 rounded-lg flex items-center justify-center hover:bg-slate-200/50 dark:hover:bg-slate-700 transition hidden">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Target Source Category Options Grid -->
+    <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-3">
+      <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block flex items-center gap-1.5">
+        <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> Target Source / File Type
+      </label>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="open_dir" checked class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-folder-open text-amber-500"></i> Open Index</span>
+        </label>
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="movies" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-film text-rose-500"></i> Movies / Video</span>
+        </label>
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="pdf_books" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-file-pdf text-red-500"></i> Books / PDF</span>
+        </label>
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="cloud_storage" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-brands fa-google-drive text-blue-500"></i> Cloud Drives</span>
+        </label>
+
+        <!-- Torrents Category -->
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="torrents" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-magnet text-emerald-500"></i> Torrents / P2P</span>
+        </label>
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="audio" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-music text-purple-500"></i> Songs / Lossless</span>
+        </label>
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="software" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-box-archive text-emerald-600"></i> Apps / Software</span>
+        </label>
+
+        <label class="cat-card flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 dark:hover:bg-slate-700/50 transition select-none">
+          <input type="radio" name="searchCat" value="custom_ext" class="w-3.5 h-3.5 text-blue-600">
+          <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-code text-teal-600"></i> Custom Format</span>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- Quick Extension Preset Chips -->
+    <div class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-2">
+      <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block flex items-center gap-1.5">
+        <i class="fa-solid fa-tags text-indigo-500"></i> File Format Extension Chips
+      </label>
+      <div class="flex flex-wrap gap-1.5 text-xs" id="extChipContainer">
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="zip">.zip</button>
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="iso">.iso</button>
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="apk">.apk</button>
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="flac">.flac</button>
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="epub">.epub</button>
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="torrent">.torrent</button>
+        <button type="button" class="ext-chip px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-mono text-[11px] hover:border-blue-500 transition" data-ext="mkv">.mkv</button>
+      </div>
+    </div>
+
+    <!-- Advanced Filters Row (Time, Size Operator, Custom Format) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+
+      <!-- Dynamic Custom Ext Container -->
+      <div id="extContainer" class="hidden bg-white dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-1.5 col-span-1">
+        <label class="font-bold text-slate-700 dark:text-slate-300 block flex items-center gap-1.5">
+          <i class="fa-solid fa-file-code text-teal-600"></i> Custom Format
+        </label>
+        <input type="text" id="customExt" placeholder="e.g. psd, iso, torrent" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-2.5 text-xs text-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:border-blue-600 transition font-medium">
+      </div>
+
+      <!-- Time Filter -->
+      <div class="bg-white dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-1.5">
+        <label class="font-bold text-slate-700 dark:text-slate-300 block flex items-center gap-1.5">
+          <i class="fa-solid fa-clock text-amber-500"></i> Upload Timeframe
+        </label>
+        <select id="timeFilter" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-600 font-semibold cursor-pointer transition">
+          <option value="" selected>Anytime (All Results)</option>
+          <option value="qdr:d">Past 24 Hours</option>
+          <option value="qdr:w">Past Week</option>
+          <option value="qdr:m">Past Month</option>
+          <option value="qdr:y">Past Year</option>
+        </select>
+      </div>
+
+      <!-- File Size Filter -->
+      <div class="bg-white dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-1.5">
+        <label class="font-bold text-slate-700 dark:text-slate-300 block flex items-center gap-1.5">
+          <i class="fa-solid fa-database text-sky-500"></i> Min File Size Keyword
+        </label>
+        <select id="sizeFilter" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-600 font-semibold cursor-pointer transition">
+          <option value="" selected>No Size Constraint</option>
+          <option value='"100MB" OR "500MB" OR "1GB"'>Medium (>100MB+)</option>
+          <option value='"1GB" OR "2GB" OR "5GB"'>Large (>1GB+)</option>
+          <option value='"10GB" OR "20GB" OR "50GB"'>Huge HD / ISO (>10GB+)</option>
+        </select>
+      </div>
+
+      <!-- Anti-Spam Switch -->
+      <div class="bg-white dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs flex items-center justify-between">
+        <div class="space-y-0.5">
+          <div class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-filter-circle-xmark text-rose-500"></i> Anti-Spam Filtering
+          </div>
+          <div class="text-[10px] text-slate-400 font-medium">Excludes Pinterest, Quora, etc.</div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="chkAntiSpam" checked class="sr-only peer">
+          <div class="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+      </div>
+
+    </div>
+
+    <!-- Generated Search Query Card -->
+    <div class="bg-slate-900 dark:bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-lg space-y-2.5 relative group">
+      <div class="flex flex-wrap justify-between items-center text-xs gap-2">
+        <span class="font-bold text-slate-300 flex items-center gap-2">
+          <i class="fa-solid fa-terminal text-emerald-400"></i> Generated Search Query
+        </span>
+
+        <!-- Copy Operators (Raw & Markdown) -->
+        <div class="flex items-center gap-2">
+          <button id="btnCopy" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl transition text-[11px] font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-copy text-amber-400"></i> Copy
+          </button>
+          <button id="btnCopyMarkdown" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl transition text-[11px] font-semibold flex items-center gap-1.5">
+            <i class="fa-brands fa-markdown text-sky-400"></i> Markdown
+          </button>
+        </div>
+      </div>
+      <div id="dorkPreview" class="p-3 bg-slate-950/90 border border-slate-800/80 font-mono text-[11px] text-emerald-400 rounded-xl break-all leading-relaxed min-h-[42px] flex items-center">
+        Enter keyword above...
+      </div>
+    </div>
+
+    <!-- Main Action CTA Buttons -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <button id="btnSearchGoogle" class="sm:col-span-2 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:opacity-95 active:scale-[0.99] font-bold text-xs text-white rounded-2xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2">
+        <i class="fa-brands fa-google text-base"></i> Direct Google Search
+      </button>
+
+      <button id="btnSearchMulti" class="py-3.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-[0.99] border border-slate-200 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-200 shadow-xs rounded-2xl transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-globe text-slate-400"></i> Multi Engine Search
+      </button>
+    </div>
+
+    <!-- Saved History, Export & Import -->
+    <div id="savedWrapper" class="bg-white dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-3 transition">
+      <div class="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-bookmark text-amber-500"></i> Recent Queries & Collections</span>
+        
+        <div class="flex items-center gap-2">
+          <button id="btnExportJSON" class="text-[10px] text-blue-500 hover:underline"><i class="fa-solid fa-download"></i> Export</button>
+          <button id="btnImportJSON" class="text-[10px] text-indigo-500 hover:underline"><i class="fa-solid fa-upload"></i> Import</button>
+          <button id="btnClearSaved" class="text-[10px] text-rose-500 hover:underline"><i class="fa-solid fa-trash"></i> Clear</button>
+        </div>
+      </div>
+
+      <input type="file" id="importFileInput" accept=".json" class="hidden">
+      <div id="savedList" class="flex flex-wrap gap-2 text-xs"></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+(function() {
+  // UI Elements
+  const rootElement = document.getElementById('dork-studio-root');
+  const btnThemeToggle = document.getElementById('btnThemeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const themeLabel = document.getElementById('themeLabel');
+
+  const inputQuery = document.getElementById('mainQuery');
+  const dorkPreview = document.getElementById('dorkPreview');
+  const btnClear = document.getElementById('btnClear');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnCopyMarkdown = document.getElementById('btnCopyMarkdown');
+  const btnSearchGoogle = document.getElementById('btnSearchGoogle');
+  const btnSearchMulti = document.getElementById('btnSearchMulti');
+  
+  const timeFilter = document.getElementById('timeFilter');
+  const sizeFilter = document.getElementById('sizeFilter');
+  const customExt = document.getElementById('customExt');
+  const extContainer = document.getElementById('extContainer');
+  const chkAntiSpam = document.getElementById('chkAntiSpam');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+  const extChips = document.querySelectorAll('.ext-chip');
+  
+  const savedWrapper = document.getElementById('savedWrapper');
+  const savedList = document.getElementById('savedList');
+  const btnClearSaved = document.getElementById('btnClearSaved');
+  const btnExportJSON = document.getElementById('btnExportJSON');
+  const btnImportJSON = document.getElementById('btnImportJSON');
+  const importFileInput = document.getElementById('importFileInput');
+
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  const toastIcon = document.getElementById('toastIcon');
+
+  let savedQueries = JSON.parse(localStorage.getItem('b_dork_saved_pro') || '[]');
+
+  // --- Theme Controller ---
+  function initTheme() {
+    const savedTheme = localStorage.getItem('b_dork_theme') || 'dark';
+    if (savedTheme === 'dark') {
+      rootElement.classList.add('dark');
+      themeIcon.className = 'fa-solid fa-sun text-amber-400';
+      themeLabel.textContent = 'Light';
+    } else {
+      rootElement.classList.remove('dark');
+      themeIcon.className = 'fa-solid fa-moon text-indigo-500';
+      themeLabel.textContent = 'Dark';
+    }
+  }
+
+  btnThemeToggle.addEventListener('click', () => {
+    const isDark = rootElement.classList.toggle('dark');
+    localStorage.setItem('b_dork_theme', isDark ? 'dark' : 'light');
+    themeIcon.className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-500';
+    themeLabel.textContent = isDark ? 'Light' : 'Dark';
+  });
+
+  // --- Toast Manager ---
+  function showToast(msg, isError = false) {
+    toastMsg.textContent = msg;
+    toastIcon.className = isError 
+      ? 'fa-solid fa-triangle-exclamation text-rose-400 text-sm' 
+      : 'fa-solid fa-circle-check text-emerald-400 text-sm';
+    
+    toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+
+    setTimeout(() => {
+      toast.classList.remove('translate-y-0', 'opacity-100');
+      toast.classList.add('translate-y-[-100px]', 'opacity-0');
+    }, 2800);
+  }
+
+  // --- Saved Queries & History ---
+  function updateSavedUI() {
+    if (savedQueries.length === 0) {
+      savedList.innerHTML = `<span class="text-slate-400 text-[11px]">No saved queries yet. Run a search to record history.</span>`;
+      return;
+    }
+    savedList.innerHTML = savedQueries.map((item, idx) => `
+      <span class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl flex items-center gap-2 text-[11px] font-medium shadow-2xs group hover:border-blue-400 transition">
+        <span class="cursor-pointer hover:text-blue-500 font-semibold" onclick="window.applySaved('${encodeURIComponent(item)}')">${item}</span>
+        <i class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer" onclick="window.removeSaved(${idx})"></i>
+      </span>
+    `).join('');
+  }
+
+  window.applySaved = function(queryStr) {
+    inputQuery.value = decodeURIComponent(queryStr);
+    toggleClearButton();
+    generateDork();
+    showToast(`Loaded: "${inputQuery.value}"`);
+  };
+
+  window.removeSaved = function(idx) {
+    savedQueries.splice(idx, 1);
+    localStorage.setItem('b_dork_saved_pro', JSON.stringify(savedQueries));
+    updateSavedUI();
+  };
+
+  btnClearSaved.addEventListener('click', () => {
+    savedQueries = [];
+    localStorage.removeItem('b_dork_saved_pro');
+    updateSavedUI();
+    showToast('Search history cleared');
+  });
+
+  // Export JSON
+  btnExportJSON.addEventListener('click', () => {
+    if (savedQueries.length === 0) {
+      showToast('No saved queries to export', true);
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedQueries, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `dork_collections_${Date.now()}.json`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+    showToast('Exported query collection JSON');
+  });
+
+  // Import JSON
+  btnImportJSON.addEventListener('click', () => importFileInput.click());
+
+  importFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        const imported = JSON.parse(evt.target.result);
+        if (Array.isArray(imported)) {
+          savedQueries = Array.from(new Set([...imported, ...savedQueries]));
+          localStorage.setItem('b_dork_saved_pro', JSON.stringify(savedQueries));
+          updateSavedUI();
+          showToast('Imported queries successfully');
+        } else {
+          showToast('Invalid JSON format', true);
+        }
+      } catch (err) {
+        showToast('Error parsing JSON file', true);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // --- Dork Logic Engine ---
+  function generateDork() {
+    const kw = inputQuery.value.trim();
+    if (!kw) {
+      dorkPreview.textContent = "Enter keyword above...";
+      dorkPreview.classList.add('text-slate-500');
+      dorkPreview.classList.remove('text-emerald-400');
+      return "";
+    }
+
+    dorkPreview.classList.remove('text-slate-500');
+    dorkPreview.classList.add('text-emerald-400');
+
+    const catRadio = document.querySelector('input[name="searchCat"]:checked');
+    const category = catRadio ? catRadio.value : 'open_dir';
+    let dork = '';
+
+    switch (category) {
+      case 'open_dir':
+        dork = `intitle:"index.of" "${kw}"`;
+        break;
+      case 'movies':
+        dork = `intitle:"index.of" (mkv|mp4|avi) "${kw}"`;
+        break;
+      case 'pdf_books':
+        dork = `"${kw}" (filetype:pdf OR filetype:epub OR filetype:mobi)`;
+        break;
+      case 'cloud_storage':
+        dork = `("${kw}" site:drive.google.com OR site:mega.nz OR site:mediafire.com OR site:dropbox.com)`;
+        break;
+      case 'torrents':
+        dork = `("${kw}" (filetype:torrent OR inurl:torrent OR intitle:"index of" torrent OR site:bt-hash.com))`;
+        break;
+      case 'audio':
+        dork = `intitle:"index.of" (mp3|flac|wav|alac) "${kw}"`;
+        break;
+      case 'software':
+        dork = `intitle:"index.of" (exe|iso|zip|rar|apk) "${kw}"`;
+        break;
+      case 'custom_ext':
+        const ext = customExt.value.trim() || 'zip';
+        dork = `"${kw}" filetype:${ext}`;
+        break;
+      default:
+        dork = `intitle:"index.of" "${kw}"`;
+    }
+
+    // Size filter appending
+    if (sizeFilter.value) {
+      dork += ` (${sizeFilter.value})`;
+    }
+
+    // Anti-spam filters
+    if (chkAntiSpam.checked) {
+      dork += ' -site:pinterest.com -site:quora.com -site:amazon.com -inurl:html';
+    }
+
+    dorkPreview.textContent = dork;
+    return dork;
+  }
+
+  function saveQuery(kw) {
+    if (kw && !savedQueries.includes(kw)) {
+      savedQueries.unshift(kw);
+      if (savedQueries.length > 12) savedQueries.pop();
+      localStorage.setItem('b_dork_saved_pro', JSON.stringify(savedQueries));
+      updateSavedUI();
+    }
+  }
+
+  function toggleClearButton() {
+    if (inputQuery.value.length > 0) {
+      btnClear.classList.remove('hidden');
+    } else {
+      btnClear.classList.add('hidden');
+    }
+  }
+
+  // --- Handlers & Listeners ---
+  inputQuery.addEventListener('input', () => {
+    toggleClearButton();
+    generateDork();
+  });
+
+  inputQuery.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      btnSearchGoogle.click();
+    }
+  });
+
+  customExt.addEventListener('input', generateDork);
+  timeFilter.addEventListener('change', generateDork);
+  sizeFilter.addEventListener('change', generateDork);
+  chkAntiSpam.addEventListener('change', generateDork);
+
+  document.querySelectorAll('input[name="searchCat"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if (e.target.value === 'custom_ext') {
+        extContainer.classList.remove('hidden');
+      } else {
+        extContainer.classList.add('hidden');
+      }
+      generateDork();
+    });
+  });
+
+  // Preset Buttons
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const kw = btn.getAttribute('data-keyword');
+      const cat = btn.getAttribute('data-cat');
+      inputQuery.value = kw;
+      toggleClearButton();
+
+      const targetRadio = document.querySelector(`input[name="searchCat"][value="${cat}"]`);
+      if (targetRadio) targetRadio.checked = true;
+
+      if (cat === 'custom_ext') {
+        extContainer.classList.remove('hidden');
+      } else {
+        extContainer.classList.add('hidden');
+      }
+
+      generateDork();
+      showToast(`Preset loaded: "${kw}"`);
+    });
+  });
+
+  // Extension Chips
+  extChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const ext = chip.getAttribute('data-ext');
+      const customRadio = document.querySelector('input[name="searchCat"][value="custom_ext"]');
+      if (customRadio) customRadio.checked = true;
+      extContainer.classList.remove('hidden');
+      customExt.value = ext;
+      generateDork();
+      showToast(`Extension set to .${ext}`);
+    });
+  });
+
+  btnClear.addEventListener('click', () => {
+    inputQuery.value = '';
+    toggleClearButton();
+    generateDork();
+    inputQuery.focus();
+  });
+
+  // Copy String
+  btnCopy.addEventListener('click', () => {
+    const text = dorkPreview.textContent;
+    if (text && text !== "Enter keyword above...") {
+      navigator.clipboard.writeText(text);
+      showToast("Query copied to clipboard!");
+    } else {
+      showToast("Please enter a keyword first!", true);
+    }
+  });
+
+  // Copy Markdown Format
+  btnCopyMarkdown.addEventListener('click', () => {
+    const dork = generateDork();
+    if (dork) {
+      let googleUrl = 'https://www.google.com/search?q=' + encodeURIComponent(dork);
+      if (timeFilter.value) googleUrl += '&tbs=' + timeFilter.value;
+      const markdown = `[Google Dork Search: "${inputQuery.value.trim()}"](${googleUrl})`;
+      navigator.clipboard.writeText(markdown);
+      showToast("Copied as Markdown link!");
+    } else {
+      showToast("Please enter a keyword first!", true);
+    }
+  });
+
+  // Direct Google Search
+  btnSearchGoogle.addEventListener('click', () => {
+    const dork = generateDork();
+    if (!dork) {
+      showToast("Please enter a keyword first!", true);
+      return;
+    }
+    saveQuery(inputQuery.value.trim());
+
+    let url = 'https://www.google.com/search?q=' + encodeURIComponent(dork);
+    if (timeFilter.value) {
+      url += '&tbs=' + timeFilter.value;
+    }
+    window.open(url, '_blank');
+  });
+
+  // Multi-Engine Search
+  btnSearchMulti.addEventListener('click', () => {
+    const kw = inputQuery.value.trim();
+    if (!kw) {
+      showToast("Please enter a keyword first!", true);
+      return;
+    }
+    saveQuery(kw);
+
+    const dork = generateDork();
+    window.open('https://archive.org/search.php?query=' + encodeURIComponent(kw), '_blank');
+    window.open('https://duckduckgo.com/?q=' + encodeURIComponent(dork), '_blank');
+    window.open('https://btdig.com/search?q=' + encodeURIComponent(kw), '_blank');
+  });
+
+  // Initialize
+  initTheme();
+  updateSavedUI();
+})();
+</script>
+</body>
+</html>
