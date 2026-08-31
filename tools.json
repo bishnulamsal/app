@@ -1,5 +1,12 @@
 [
   {
+    "title": "BTV Nepal — Live TV",
+    "desc": "Static web application tool.",
+    "url": "tools/iptv-bishnulamsal-tv.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Plus UI Studio v4.0 - Advanced Blogger Thumbnail Generator",
     "desc": "Static web application tool.",
     "url": "tools/post-thumbnail-generator.html",
