@@ -1,16 +1,9 @@
 [
   {
-    "title": "Post Thumbnail Generator",
-    "desc": "Easily Create Post Thumbnail for blog post.",
-    "url": "/post-thumbnail-generator.html",
-    "icon": "📝",
-    "tag": "Converter"
-  },
-  {
-    "title": "Unicode to Preeti converter",
-    "desc": "Create fast and custom lightweight short links dynamically.",
-    "url": "/preeti-to-unicode-converter.html",
-    "icon": "🔗",
+    "title": "Unicode",
+    "desc": "Static web application tool.",
+    "url": "tools/unicode.html",
+    "icon": "⚡",
     "tag": "Utility"
   }
 ]
