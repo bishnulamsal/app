@@ -35,6 +35,13 @@
     "tag": "Utility"
   },
   {
+    "title": "Roman ⇄ Unicode — नेपाली फन्ट कन्भर्टर",
+    "desc": "Static web application tool.",
+    "url": "tools/roman-to-unicode-converter.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Text to Voice Converter",
     "desc": "Static web application tool.",
     "url": "tools/text-to-voice-converter.html",
