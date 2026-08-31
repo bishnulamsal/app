@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ne" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unicode ⇄ Preeti — नेपाली फन्ट कन्भर्टर</title>
+<meta name="description" content="Convert Nepali Unicode text to Preeti font instantly. Free, offline-capable, browser-based converter with dark and light themes.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* Preeti webfont — loaded from a public GitHub mirror via jsDelivr, with local() fallbacks
+     for anyone who already has the font installed on their machine. */
+  @font-face{
+    font-family:"Preeti";
+    src: local("Preeti"), local("Preeti Normal"),
+         url("https://cdn.jsdelivr.net/gh/mhnpd/nepali-font/fonts/Preeti.TTF") format("truetype");
+    font-display: swap;
+  }
+
+  :root{
+    --paper:      #F4EEDF;
+    --paper-2:    #FBF8EF;
+    --paper-3:    #EAE1CB;
+    --ink:        #2A2116;
+    --ink-soft:   #5B4F3E;
+    --crimson:    #A32638;
+    --crimson-2:  #7E1C2A;
+    --indigo:     #1F3B60;
+    --brass:      #A47C2E;
+    --rule:       rgba(42,33,22,0.16);
+    --rule-strong:rgba(42,33,22,0.30);
+    --shadow:     0 1px 2px rgba(42,33,22,0.06), 0 8px 24px -12px rgba(42,33,22,0.18);
+    --radius:     14px;
+    --font-display:"Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;
+    --font-body:  "IBM Plex Sans", "Segoe UI", sans-serif;
+    --font-mono:  "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+  }
+
+  html[data-theme="dark"]{
+    --paper:      #1B1611;
+    --paper-2:    #221C15;
+    --paper-3:    #2C241B;
+    --ink:        #EFE6D2;
+    --ink-soft:   #B9AD94;
+    --crimson:    #E0637A;
+    --crimson-2:  #C94A62;
+    --indigo:     #7FA3D6;
+    --brass:      #D6B15C;
+    --rule:       rgba(239,230,210,0.14);
+    --rule-strong:rgba(239,230,210,0.26);
+    --shadow:     0 1px 2px rgba(0,0,0,0.3), 0 12px 30px -14px rgba(0,0,0,0.6);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ color-scheme: light dark; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, color-mix(in srgb, var(--brass) 10%, transparent), transparent),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+  }
+  a{ color:var(--indigo); }
+  ::selection{ background:color-mix(in srgb, var(--crimson) 30%, transparent); }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- Header ---------- */
+  header.top{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter:saturate(140%) blur(10px);
+    background:color-mix(in srgb, var(--paper) 86%, transparent);
+    border-bottom:1px solid var(--rule);
+  }
+  .top-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 0;
+  }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand .np{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:var(--crimson); }
+  .brand .en{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
+
+  .theme-toggle{
+    display:flex; align-items:center; gap:8px;
+    background:var(--paper-2); border:1px solid var(--rule); border-radius:999px;
+    padding:5px 6px; cursor:pointer; font-family:var(--font-mono); font-size:.72rem;
+    color:var(--ink-soft);
+  }
+  .theme-toggle svg{ width:15px; height:15px; display:block; }
+  .theme-toggle .dot{
+    width:18px; height:18px; border-radius:50%; background:var(--crimson);
+    display:flex; align-items:center; justify-content:center; color:var(--paper-2);
+    transition:transform .2s ease;
+  }
+  html[data-theme="dark"] .theme-toggle .dot{ background:var(--brass); }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding:46px 0 22px; }
+  .hero h1{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(1.6rem, 3.4vw, 2.5rem);
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 .accent{ color:var(--crimson); }
+  .hero p{ max-width:640px; color:var(--ink-soft); margin:0; font-size:1rem; }
+
+  .perforation{
+    display:flex; gap:7px; align-items:center; margin:26px 0 0; opacity:.9;
+  }
+  .perforation span{ width:5px; height:5px; border-radius:50%; background:var(--rule-strong); flex:none; }
+  .perforation::after{ content:""; height:1px; flex:1; background:var(--rule); }
+
+  /* ---------- Converter ---------- */
+  .converter{
+    display:grid;
+    grid-template-columns: 1fr 44px 1fr;
+    gap:0;
+    margin:28px 0 8px;
+    border:1px solid var(--rule);
+    border-radius:var(--radius);
+    background:var(--paper-2);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  @media (max-width: 860px){
+    .converter{ grid-template-columns:1fr; }
+    .seam{ height:44px; }
+  }
+
+  .panel{ display:flex; flex-direction:column; min-width:0; }
+  .panel + .panel{ }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:14px 18px; border-bottom:1px solid var(--rule);
+    background:var(--paper-3);
+  }
+  .panel-title{ display:flex; align-items:center; gap:8px; }
+  .panel-title .label{ font-weight:600; font-size:.92rem; }
+  .panel-title .sub{ font-family:var(--font-mono); font-size:.68rem; color:var(--ink-soft); letter-spacing:.04em; }
+
+  .mode-switch{
+    display:inline-flex; background:var(--paper); border:1px solid var(--rule); border-radius:999px; padding:2px;
+  }
+  .mode-switch button{
+    border:0; background:transparent; color:var(--ink-soft); font-family:var(--font-mono);
+    font-size:.68rem; padding:5px 10px; border-radius:999px; cursor:pointer; letter-spacing:.03em;
+  }
+  .mode-switch button.active{ background:var(--crimson); color:#fff; }
+
+  .panel-body{ position:relative; flex:1; display:flex; flex-direction:column; }
+
+  textarea, .output-box{
+    width:100%; flex:1; min-height:260px; resize:vertical;
+    border:0; outline:0; padding:20px 18px;
+    background:transparent; color:var(--ink);
+    font-size:1.15rem; line-height:1.9;
+  }
+  #unicodeInput{ font-family:var(--font-display); }
+  #preetiOutput{
+    font-family:"Preeti", var(--font-display);
+    font-size:1.35rem;
+    white-space:pre-wrap; word-break:break-word;
+    cursor:text;
+  }
+  textarea::placeholder{ color:var(--ink-soft); opacity:.65; font-family:var(--font-body); font-size:.95rem; }
+
+  .romanized-row{
+    display:none; gap:8px; padding:10px 14px; border-bottom:1px dashed var(--rule);
+    background:var(--paper);
+    align-items:center;
+  }
+  .romanized-row.show{ display:flex; }
+  .romanized-row input{
+    flex:1; border:1px solid var(--rule); border-radius:9px; padding:9px 12px;
+    font-family:var(--font-mono); font-size:.92rem; background:var(--paper-2); color:var(--ink); outline:0;
+  }
+  .romanized-row input:focus{ border-color:var(--crimson); }
+  .romanized-preview{ font-family:var(--font-display); font-size:1.05rem; color:var(--ink-soft); min-width:0; max-width:34%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .romanized-row button{
+    flex:none; border:0; border-radius:8px; background:var(--indigo); color:#fff; font-size:.72rem;
+    font-family:var(--font-mono); padding:8px 10px; cursor:pointer;
+  }
+
+  .panel-foot{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 16px; border-top:1px solid var(--rule); background:var(--paper-3);
+    font-family:var(--font-mono); font-size:.7rem; color:var(--ink-soft);
+  }
+  .foot-actions{ display:flex; gap:6px; }
+  .btn{
+    border:1px solid var(--rule-strong); background:var(--paper-2); color:var(--ink);
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.02em;
+    padding:7px 11px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn:hover{ background:var(--paper); }
+  .btn:active{ transform:translateY(1px); }
+  .btn.primary{ background:var(--crimson); border-color:var(--crimson); color:#fff; }
+  .btn.primary:hover{ background:var(--crimson-2); }
+  .btn svg{ width:13px; height:13px; }
+
+  .seam{
+    display:flex; align-items:center; justify-content:center; position:relative;
+    background:
+      repeating-linear-gradient(to bottom, var(--rule-strong) 0 6px, transparent 6px 14px);
+    background-size:1px 100%; background-repeat:no-repeat; background-position:center;
+  }
+  .seam .arrow{
+    width:30px; height:30px; border-radius:50%; background:var(--paper-2); border:1px solid var(--rule-strong);
+    display:flex; align-items:center; justify-content:center; color:var(--crimson); flex:none;
+  }
+  @media (max-width:860px){
+    .seam{ background:repeating-linear-gradient(to right, var(--rule-strong) 0 6px, transparent 6px 14px); background-size:100% 1px; }
+    .seam .arrow{ transform:rotate(90deg); }
+  }
+
+  .font-banner{
+    display:none; align-items:center; gap:10px; margin:14px 0 0;
+    padding:11px 16px; border-radius:10px; border:1px solid color-mix(in srgb, var(--crimson) 45%, var(--rule));
+    background:color-mix(in srgb, var(--crimson) 10%, var(--paper-2));
+    font-size:.85rem; color:var(--ink);
+  }
+  .font-banner.show{ display:flex; }
+  .font-banner strong{ color:var(--crimson); }
+
+  /* ---------- Instructions ---------- */
+  .section{ margin:56px 0; }
+  .section h2{
+    font-family:var(--font-display); font-size:1.35rem; margin:0 0 6px;
+  }
+  .section .eyebrow{
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--brass); margin:0 0 8px;
+  }
+  .cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:14px; margin-top:20px; }
+  .card{
+    border:1px solid var(--rule); background:var(--paper-2); border-radius:var(--radius);
+    padding:18px; box-shadow:var(--shadow);
+  }
+  .card .num{ font-family:var(--font-mono); font-size:.75rem; color:var(--crimson); margin-bottom:8px; }
+  .card h3{ margin:0 0 6px; font-size:1rem; }
+  .card p{ margin:0; color:var(--ink-soft); font-size:.9rem; }
+
+  .faq{ margin-top:18px; border-top:1px solid var(--rule); }
+  .faq details{ border-bottom:1px solid var(--rule); padding:14px 0; }
+  .faq summary{ cursor:pointer; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:10px; }
+  .faq summary::-webkit-details-marker{ display:none; }
+  .faq summary::after{ content:"+"; color:var(--crimson); font-family:var(--font-mono); }
+  .faq details[open] summary::after{ content:"–"; }
+  .faq p{ margin:10px 0 0; color:var(--ink-soft); font-size:.92rem; max-width:70ch; }
+  .faq code{ font-family:var(--font-mono); background:var(--paper-3); padding:1px 6px; border-radius:5px; font-size:.85em; }
+
+  .limits{
+    margin-top:16px; padding:16px 18px; border-radius:var(--radius); border:1px dashed var(--rule-strong);
+    background:var(--paper-2); font-size:.88rem; color:var(--ink-soft);
+  }
+  .limits strong{ color:var(--ink); }
+
+  footer{
+    border-top:1px solid var(--rule); margin-top:40px; padding:26px 0 50px;
+    font-family:var(--font-mono); font-size:.72rem; color:var(--ink-soft);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="brand">
+      <span class="np">प्रीति</span>
+      <span class="en">Unicode ⇄ Preeti</span>
+    </div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark and light theme">
+      <span id="themeLabel">Light</span>
+      <span class="dot" id="themeDot">
+        <svg viewBox="0 0 24 24" fill="none" id="themeIcon"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/></svg>
+      </span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h1>Nepali <span class="accent">Unicode</span> → <span class="accent">Preeti</span> font converter</h1>
+    <p>Type or paste Unicode Nepali on the left — get pixel-correct Preeti font output on the right, instantly, entirely in your browser. Nothing you type is uploaded anywhere.</p>
+    <div class="perforation" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </section>
+
+  <section class="converter" aria-label="Converter">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">
+          <span class="np" style="font-family:var(--font-display); font-weight:700; color:var(--indigo);">युनिकोड</span>
+          <span class="sub">UNICODE NEPALI — INPUT</span>
+        </div>
+        <div class="mode-switch" role="tablist" aria-label="Input mode">
+          <button type="button" id="modeUnicode" class="active">Unicode</button>
+          <button type="button" id="modeRoman">Romanized</button>
+        </div>
+      </div>
+
+      <div class="romanized-row" id="romanizedRow">
+        <input type="text" id="romanInput" placeholder="e.g. namaste, dhanyabad, nepal…" autocomplete="off" spellcheck="false">
+        <span class="romanized-preview" id="romanPreview">नमस्ते</span>
+        <button type="button" id="romanInsert">Insert →</button>
+      </div>
+
+      <div class="panel-body">
+        <textarea id="unicodeInput" placeholder="यहाँ नेपाली युनिकोड टाइप गर्नुहोस् वा पेस्ट गर्नुहोस्…" spellcheck="false" autocomplete="off"></textarea>
+      </div>
+
+      <div class="panel-foot">
+        <span id="unicodeCount">0 characters</span>
+        <div class="foot-actions">
+          <button class="btn" id="pasteBtn" type="button">Paste</button>
+          <button class="btn" id="clearBtn" type="button">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="seam" aria-hidden="true">
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h15M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">
+          <span style="font-family:var(--font-display); font-weight:700; color:var(--crimson);">Preeti</span>
+          <span class="sub">LEGACY FONT — OUTPUT</span>
+        </div>
+        <span class="sub" id="fontStatus">checking font…</span>
+      </div>
+      <div class="panel-body">
+        <div id="preetiOutput" class="output-box" tabindex="0" aria-label="Preeti output" contenteditable="false"></div>
+      </div>
+      <div class="panel-foot">
+        <span id="preetiCount">0 characters</span>
+        <div class="foot-actions">
+          <button class="btn primary" id="copyBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M5 15V6a1 1 0 0 1 1-1h9" stroke="currentColor" stroke-width="1.6"/></svg>
+            Copy
+          </button>
+          <button class="btn" id="downloadBtn" type="button">Download .txt</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="font-banner" id="fontBanner">
+    <span>⚠</span>
+    <span><strong>Preeti font didn't load.</strong> The output box is showing raw characters instead of Nepali glyphs. Check your connection, or <a href="https://github.com/mhnpd/nepali-font" target="_blank" rel="noopener">download the Preeti font</a> and install it on your device — the text is still 100% correct underneath.</span>
+  </div>
+
+  <section class="section" id="how">
+    <p class="eyebrow">How it works</p>
+    <h2>Three steps, zero uploads</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Paste your Unicode Nepali</h3>
+        <p>Drop in text copied from Facebook, WhatsApp, a Word doc, or anywhere else Nepali Unicode already lives. Or switch to Romanized mode and type phonetically.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Watch it convert live</h3>
+        <p>As you type, the tool reorders matras (like ि), repositions reph (र्), and swaps in the correct Preeti keystrokes — automatically, letter by letter.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Copy into Preeti-based software</h3>
+        <p>Paste the result into Word, PageMaker, CorelDRAW, or any old template — then apply the Preeti font. It'll display exactly like classic Nepali print.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="why">
+    <p class="eyebrow">Why this exists</p>
+    <h2>Preeti still runs Nepal's paperwork</h2>
+    <p style="max-width:70ch; color:var(--ink-soft);">Preeti isn't real Devanagari Unicode — it's a font that maps ordinary keyboard letters onto Nepali-looking glyphs. Type <code style="font-family:var(--font-mono); background:var(--paper-3); padding:1px 6px; border-radius:5px;">g]kfn</code> with Preeti applied and you see <strong style="font-family:var(--font-display);">नेपाल</strong> — remove the font, and it's meaningless ASCII again. That trick still powers a lot of government forms, court paperwork, and older DTP templates (PageMaker, CorelDRAW, old Word macros) built years before Unicode became standard. This tool bridges the two: write normally in modern Unicode, get legacy-correct Preeti keystrokes back out.</p>
+  </section>
+
+  <section class="section" id="faq">
+    <p class="eyebrow">Notes &amp; instructions</p>
+    <h2>Good to know</h2>
+    <div class="faq">
+      <details open>
+        <summary>The output looks like scrambled English, not Nepali</summary>
+        <p>That's expected until the Preeti font finishes loading in your browser — it's loaded automatically from a public CDN the first time you open this page. If it never loads (e.g. you're fully offline), you'll see a warning banner above with a link to download and install Preeti locally. Either way, the underlying <em>text</em> is already correct — only the visual font is missing.</p>
+      </details>
+      <details>
+        <summary>Why does it reorder some letters?</summary>
+        <p>Preeti is a <em>visual</em>-order font, while Unicode stores letters in <em>logical</em> (spoken) order. Two Nepali marks always move: the short <code>ि</code> matra jumps to <em>before</em> its consonant (Unicode: <code>कि</code> → Preeti keys: <code>ल + क</code>), and reph (<code>र्</code> at the start of a syllable) jumps to <em>after</em> the whole cluster it sits over. This converter handles both automatically.</p>
+      </details>
+      <details>
+        <summary>Can I type Romanized Nepali directly?</summary>
+        <p>Yes — switch the input mode to <strong>Romanized</strong> above the left panel. Type phonetically (e.g. <code>ramro</code>, <code>dhanyabad</code>), watch the live Devanagari preview, then hit <strong>Insert →</strong> to drop it into the main box. This is a best-effort phonetic guess, so double-check longer words.</p>
+      </details>
+      <details>
+        <summary>Is my text uploaded anywhere?</summary>
+        <p>No. Every conversion runs locally in your browser with plain JavaScript — nothing is sent to a server, logged, or stored. You can even save this page and use it fully offline once the font is cached.</p>
+      </details>
+      <details>
+        <summary>Does this work for documents, not just short text?</summary>
+        <p>Yes — paste as much text as you like into the left panel. For a full document already in a Word or PDF file, you'd still need to extract the text first; this tool converts plain text only.</p>
+      </details>
+    </div>
+
+    <div class="limits">
+      <strong>Known limits.</strong> This engine covers the full common alphabet, matras, digits, punctuation, reph, and the standard conjuncts (क्ष, त्र, ज्ञ, श्र, द्य, द्व, ङ्ग and friends). A handful of very rare letters and multi-consonant stacks (ॠ, ऌ, uncommon four-letter conjuncts) fall back to a generic — usually still readable — combination rather than a dedicated shortcut key. For anything going to print or an official document, give the Preeti output a quick visual check before sending it off.
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span>Runs entirely client-side · no data leaves your browser</span>
+  <span>Preeti font © its respective creator, used for display only</span>
+</footer>
+
+<script>
+'use strict';
+
+/* ============================================================
+   THEME
+   ============================================================ */
+(function(){
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const label = document.getElementById('themeLabel');
+  const stored = localStorage.getItem('preeti-tool-theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initial = stored || (prefersDark ? 'dark' : 'light');
+  root.setAttribute('data-theme', initial);
+  label.textContent = initial === 'dark' ? 'Dark' : 'Light';
+
+  toggle.addEventListener('click', function(){
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('preeti-tool-theme', next);
+    label.textContent = next === 'dark' ? 'Dark' : 'Light';
+  });
+})();
+
+/* ============================================================
+   PREETI FONT LOAD CHECK
+   ============================================================ */
+(function(){
+  const statusEl = document.getElementById('fontStatus');
+  const banner = document.getElementById('fontBanner');
+  if (!('fonts' in document)){ statusEl.textContent = ''; return; }
+  statusEl.textContent = 'loading font…';
+  const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000));
+  Promise.race([document.fonts.load('16px Preeti'), timeout])
+    .then(() => {
+      statusEl.textContent = 'font ready ✓';
+      statusEl.style.color = 'var(--indigo)';
+    })
+    .catch(() => {
+      statusEl.textContent = 'font unavailable';
+      statusEl.style.color = 'var(--crimson)';
+      banner.classList.add('show');
+    });
+})();
+
+/* ============================================================
+   UNICODE DEVANAGARI  →  PREETI  CONVERSION ENGINE
+   ============================================================ */
+const PreetiEngine = (function(){
+  const VIRAMA = '\u094D';
+  const IMATRA = '\u093F';
+  const RA = '\u0930';
+  const isConsonant = c => c >= '\u0915' && c <= '\u0939';
+  const isIndepVowel = c => '\u0905\u0906\u0907\u0908\u0909\u090A\u090B\u090F\u0910\u0913\u0914'.indexOf(c) !== -1;
+
+  const CONS_BASE = {
+    '\u0915':'s','\u0916':'v','\u0917':'u','\u0918':'3','\u0919':'\u00aa',
+    '\u091a':'r','\u091b':'5','\u091c':'h','\u091d':'\u00b4','\u091e':'`',
+    '\u091f':'6','\u0920':'7','\u0921':'8','\u0922':'9','\u0923':'0',
+    '\u0924':'t','\u0925':'y','\u0926':'b','\u0927':'w','\u0928':'g',
+    '\u092a':'k','\u092b':'km','\u092c':'a','\u092d':'e','\u092e':'d',
+    '\u092f':'o','\u0930':'/','\u0932':'n','\u0935':'j','\u0936':'z',
+    '\u0937':'i','\u0938':';','\u0939':'x'
+  };
+  const CONS_HALF = {
+    '\u0915':'S','\u0916':'V','\u0917':'U','\u091a':'R','\u0918':'\u00a3',
+    '\u091c':'H','\u091d':'\u2030','\u091e':'~','\u0924':'T','\u0925':'Y',
+    '\u0928':'G','\u092a':'K','\u092c':'A','\u092d':'E','\u0932':'N',
+    '\u0935':'J','\u0936':'Z','\u0938':':','\u0939':'X',
+    '\u092e':'D','\u0927':'W','\u0923':'0'
+  };
+  const baseForm = c => CONS_BASE[c] || '';
+  const halfForm = c => CONS_HALF[c] || (CONS_BASE[c] ? CONS_BASE[c] + '\\' : '');
+
+  const VOWELS = {
+    '\u0905':'c','\u0906':'cf','\u0907':'O','\u0908':'O{','\u0909':'p',
+    '\u090A':'pm','\u090B':'C','\u090F':'P','\u0910':'P]','\u0913':'cf]',
+    '\u0914':'cf}'
+  };
+  const MATRA = {
+    '\u093e':'f','\u0940':'L',"\u0941":"'",'\u0942':'"','\u0943':'[',
+    '\u0947':']','\u0948':'}','\u094b':'f]','\u094c':'f}'
+  };
+  const TRAIL = { '\u0902':'+', '\u0903':'M', '\u0901':'F' };
+  const DIGIT = {'\u0966':')','\u0967':'!','\u0968':'@','\u0969':'#','\u096a':'$','\u096b':'%','\u096c':'^','\u096d':'&','\u096e':'*','\u096f':'('};
+  const OTHER = { '\u0964':'.', '\u0965':'..', '\u093d':'\u02dc', '\u0950':'\u00e7' };
+
+  const PAIR_SPECIAL = {
+    '\u0915\u0937':'I', '\u091c\u091e':'1', '\u0924\u0930':'q', '\u0936\u0930':'>',
+    '\u091f\u091f':'\u00a7','\u0921\u0921':'\u2022','\u0926\u0926':'2','\u0926\u0927':'4',
+    '\u0926\u0918':'\u00a2','\u0926\u092f':'B','\u0926\u0935':'\u00e5','\u0926\u0930':'\u203a',
+    '\u0926\u092e':'\u00df','\u0919\u0917':'\u00cb','\u0919\u0915':'\u00cd','\u0919\u0916':'\u00ce',
+    '\u0919\u0918':'\u2039','\u0919\u0922':'\u00b0','\u0920\u0920':'\u00b6','\u091f\u0920':'\u00dd',
+    '\u0928\u0928':'\u00cc','\u0924\u0924':'Q','\u0927\u0930':'\u201e','\u0939\u0943':'\u00c5'
+  };
+
+  function convertChain(chain){
+    let out = '', i = 0;
+    while (i < chain.length){
+      const c = chain[i];
+      const isLast = i === chain.length - 1;
+      if (!isLast){
+        const next = chain[i+1];
+        const pairKey = c + next;
+        if (PAIR_SPECIAL[pairKey]){ out += PAIR_SPECIAL[pairKey]; i += 2; continue; }
+        if (next === RA){ out += baseForm(c) + '|'; i += 2; continue; }
+        out += halfForm(c); i += 1;
+      } else {
+        out += baseForm(c); i += 1;
+      }
+    }
+    return out;
+  }
+
+  function convert(input){
+    if (!input) return '';
+    let out = '', i = 0;
+    const n = input.length;
+    while (i < n){
+      const ch = input[i];
+
+      if (isConsonant(ch)){
+        let reph = false;
+        if (ch === RA && input[i+1] === VIRAMA && isConsonant(input[i+2])){
+          reph = true; i += 2;
+        }
+        const chain = [];
+        while (true){
+          chain.push(input[i]); i += 1;
+          if (input[i] === VIRAMA && isConsonant(input[i+1])){ i += 1; continue; }
+          break;
+        }
+        let explicitFinalHalant = false;
+        if (input[i] === VIRAMA){ explicitFinalHalant = true; i += 1; }
+
+        let body = convertChain(chain);
+        if (explicitFinalHalant){
+          const lastCons = chain[chain.length-1];
+          const b = baseForm(lastCons);
+          if (b && body.endsWith(b)) body = body.slice(0, -b.length) + halfForm(lastCons);
+        }
+
+        let iMatra = false;
+        if (input[i] === IMATRA){ iMatra = true; i += 1; }
+
+        let matraOut = '';
+        if (!iMatra && MATRA[input[i]]){ matraOut = MATRA[input[i]]; i += 1; }
+
+        let trailOut = '';
+        while (TRAIL[input[i]]){ trailOut += TRAIL[input[i]]; i += 1; }
+
+        out += (iMatra ? 'l' : '') + body + matraOut + trailOut + (reph ? '\u007b' : '');
+        continue;
+      }
+
+      if (isIndepVowel(ch)){
+        let piece = VOWELS[ch] || ch;
+        i += 1;
+        while (TRAIL[input[i]]){ piece += TRAIL[input[i]]; i += 1; }
+        out += piece; continue;
+      }
+
+      if (DIGIT[ch]){ out += DIGIT[ch]; i += 1; continue; }
+      if (OTHER[ch]){ out += OTHER[ch]; i += 1; continue; }
+      if (TRAIL[ch]){ out += TRAIL[ch]; i += 1; continue; }
+      if (MATRA[ch]){ out += MATRA[ch]; i += 1; continue; }
+      if (ch === VIRAMA){ out += '\\'; i += 1; continue; }
+
+      out += ch; i += 1;
+    }
+    return out;
+  }
+
+  return { convert };
+})();
+
+/* ============================================================
+   ROMANIZED  →  UNICODE  (best-effort phonetic transliteration)
+   ============================================================ */
+const Romanizer = (function(){
+  const CONS_MULTI = [
+    ['ksh','\u0915\u094d\u0937'], ['gya','\u091c\u094d\u091e'], ['dny','\u091c\u094d\u091e'],
+    ['shr','\u0936\u094d\u0930'], ['chh','\u091b'], ['kh','\u0916'], ['gh','\u0918'],
+    ['ch','\u091a'], ['jh','\u091d'], ['ng','\u0919'],
+    ['Th','\u0920'], ['Dh','\u0922'], ['th','\u0925'], ['dh','\u0927'],
+    ['ph','\u092b'], ['bh','\u092d'], ['sh','\u0936'], ['Sh','\u0937'],
+    ['T','\u091f'], ['D','\u0921'], ['N','\u0923']
+  ];
+  const CONS_SINGLE = {
+    k:'\u0915', g:'\u0917', c:'\u091a', j:'\u091c', t:'\u0924', d:'\u0926',
+    n:'\u0928', p:'\u092a', b:'\u092c', m:'\u092e', y:'\u092f', r:'\u0930',
+    l:'\u0932', v:'\u0935', w:'\u0935', s:'\u0938', h:'\u0939', x:'\u0915\u094d\u0937',
+    f:'\u092b', q:'\u0915'
+  };
+  const VOWEL_MULTI = [
+    ['aa','\u0906','\u093e'], ['ee','\u0908','\u0940'], ['oo','\u090a','\u0942'],
+    ['ai','\u0910','\u0948'], ['au','\u0914','\u094c'], ['ri','\u090b','\u0943']
+  ];
+  const VOWEL_SINGLE = {
+    a:['\u0905',''], i:['\u0907','\u093f'], u:['\u0909','\u0941'],
+    e:['\u090f','\u0947'], o:['\u0913','\u094b'], A:['\u0906','\u093e'],
+    I:['\u0908','\u0940'], U:['\u090a','\u0942']
+  };
+
+  function tokenize(str){
+    const tokens = []; let i = 0;
+    while (i < str.length){
+      const rest = str.slice(i, i+3);
+      let matched = false;
+
+      for (const [k,v] of CONS_MULTI){
+        if (rest.toLowerCase().startsWith(k.toLowerCase()) && str.substr(i,k.length) === k){
+          tokens.push({type:'c', v}); i += k.length; matched = true; break;
+        }
+      }
+      if (matched) continue;
+
+      for (const [k,indep,matra] of VOWEL_MULTI){
+        if (str.substr(i,2).toLowerCase() === k){
+          tokens.push({type:'v', indep, matra}); i += 2; matched = true; break;
+        }
+      }
+      if (matched) continue;
+
+      const ch = str[i];
+      if (CONS_SINGLE[ch]){ tokens.push({type:'c', v:CONS_SINGLE[ch]}); i += 1; continue; }
+      if (VOWEL_SINGLE[ch]){ tokens.push({type:'v', indep:VOWEL_SINGLE[ch][0], matra:VOWEL_SINGLE[ch][1]}); i += 1; continue; }
+      if (ch === 'M'){ tokens.push({type:'trail', v:'\u0902'}); i += 1; continue; }
+
+      tokens.push({type:'raw', v:ch}); i += 1;
+    }
+    return tokens;
+  }
+
+  function romanize(str){
+    const tokens = tokenize(str);
+    let out = '';
+    let i = 0;
+    let afterConsonant = false;
+    while (i < tokens.length){
+      const t = tokens[i];
+      if (t.type === 'c'){
+        const next = tokens[i+1];
+        if (next && next.type === 'c'){
+          out += t.v + '\u094d';
+          afterConsonant = true;
+          i += 1;
+        } else if (next && next.type === 'v'){
+          out += t.v + next.matra;
+          afterConsonant = true;
+          i += 2;
+        } else {
+          out += t.v;
+          afterConsonant = true;
+          i += 1;
+        }
+      } else if (t.type === 'v'){
+        out += afterConsonant ? t.matra : t.indep;
+        afterConsonant = false;
+        i += 1;
+      } else if (t.type === 'trail'){
+        out += t.v; i += 1;
+      } else {
+        out += t.v; afterConsonant = false; i += 1;
+      }
+    }
+    return out;
+  }
+
+  return { romanize };
+})();
+
+/* ============================================================
+   UI WIRING
+   ============================================================ */
+(function(){
+  const unicodeInput = document.getElementById('unicodeInput');
+  const preetiOutput = document.getElementById('preetiOutput');
+  const unicodeCount = document.getElementById('unicodeCount');
+  const preetiCount = document.getElementById('preetiCount');
+
+  function render(){
+    const val = unicodeInput.value;
+    const out = PreetiEngine.convert(val);
+    preetiOutput.textContent = out;
+    unicodeCount.textContent = val.length + ' characters';
+    preetiCount.textContent = out.length + ' characters';
+  }
+  unicodeInput.addEventListener('input', render);
+  render();
+
+  // mode switch
+  const modeUnicode = document.getElementById('modeUnicode');
+  const modeRoman = document.getElementById('modeRoman');
+  const romanizedRow = document.getElementById('romanizedRow');
+  modeUnicode.addEventListener('click', () => {
+    modeUnicode.classList.add('active'); modeRoman.classList.remove('active');
+    romanizedRow.classList.remove('show');
+  });
+  modeRoman.addEventListener('click', () => {
+    modeRoman.classList.add('active'); modeUnicode.classList.remove('active');
+    romanizedRow.classList.add('show');
+    document.getElementById('romanInput').focus();
+  });
+
+  // romanized preview + insert
+  const romanInput = document.getElementById('romanInput');
+  const romanPreview = document.getElementById('romanPreview');
+  romanInput.addEventListener('input', () => {
+    romanPreview.textContent = Romanizer.romanize(romanInput.value) || ' ';
+  });
+  document.getElementById('romanInsert').addEventListener('click', () => {
+    const converted = Romanizer.romanize(romanInput.value);
+    if (!converted) return;
+    const needsSpace = unicodeInput.value && !unicodeInput.value.endsWith(' ') && !unicodeInput.value.endsWith('\n');
+    unicodeInput.value += (needsSpace ? ' ' : '') + converted;
+    romanInput.value = '';
+    romanPreview.textContent = '';
+    render();
+    unicodeInput.focus();
+  });
+  romanInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){ e.preventDefault(); document.getElementById('romanInsert').click(); }
+  });
+
+  // clear / paste
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    unicodeInput.value = ''; render(); unicodeInput.focus();
+  });
+  document.getElementById('pasteBtn').addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      unicodeInput.value += text; render();
+    } catch (e) {
+      unicodeInput.focus();
+    }
+  });
+
+  // copy / download preeti output
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    const text = preetiOutput.textContent;
+    const btn = document.getElementById('copyBtn');
+    try {
+      await navigator.clipboard.writeText(text);
+      const original = btn.innerHTML;
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.innerHTML = original; }, 1400);
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(preetiOutput);
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+    }
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const text = preetiOutput.textContent;
+    const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'preeti-output.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // seed with a friendly example
+  unicodeInput.value = 'नेपाल सुन्दर देश हो। यहाँ धेरै किसिमका मानिसहरू बस्छन्।';
+  render();
+})();
+</script>
+</body>
+</html>
