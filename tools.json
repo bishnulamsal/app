@@ -1,5 +1,12 @@
 [
   {
+    "title": "Photography Live Simulator",
+    "desc": "Static web application tool.",
+    "url": "tools/depth-of-field-simulator.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Dork Search - Search Everything",
     "desc": "Static web application tool.",
     "url": "tools/everything-search.html",
