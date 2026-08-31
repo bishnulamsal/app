@@ -21,6 +21,13 @@
     "tag": "Utility"
   },
   {
+    "title": "Text to Voice Converter",
+    "desc": "Static web application tool.",
+    "url": "tools/text-to-voice-converter.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Unicode ⇄ Preeti — नेपाली फन्ट कन्भर्टर",
     "desc": "Static web application tool.",
     "url": "tools/unicode-to-preeti-converter.html",
