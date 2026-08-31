@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Tools Hub - Bishnu Lamsal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: '#3b82f6',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+  <!-- Header Section -->
+  <header class="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🚀</span>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
+          Web Tools Hub
+        </h1>
+      </div>
+      <button id="themeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:opacity-80 transition">
+        <span id="themeIcon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    
+    <!-- Search Bar & Filters -->
+    <div class="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div class="w-full sm:w-96 relative">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search tools..." 
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        />
+      </div>
+      <div id="statusBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+        Live Auto Sync
+      </div>
+    </div>
+
+    <!-- Tools Grid Container -->
+    <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Loading Skeleton -->
+      <div class="animate-pulse bg-gray-200 dark:bg-gray-800 h-44 rounded-2xl"></div>
+      <div class="animate-pulse bg-gray-200 dark:bg-gray-800 h-44 rounded-2xl"></div>
+      <div class="animate-pulse bg-gray-200 dark:bg-gray-800 h-44 rounded-2xl"></div>
+    </div>
+
+  </main>
+
+  <!-- Script for Dynamic Load & Search -->
+  <script>
+    // Config: GitHub Details (Change as needed)
+    const GITHUB_USER = 'bishnulamsal'; 
+    const REPO_NAME = 'app';
+
+    let allTools = [];
+
+    // Fetch Tools Dynamically
+    async function loadTools() {
+      const grid = document.getElementById('toolsGrid');
+      
+      try {
+        // Method A: Fetch tools.json for fast metadata loading
+        const res = await fetch('tools.json');
+        if (res.ok) {
+          allTools = await res.json();
+          renderCards(allTools);
+          return;
+        }
+
+        // Method B: Fallback to GitHub REST API (direct directory scan)
+        const apiRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/tools`);
+        if (apiRes.ok) {
+          const files = await apiRes.json();
+          allTools = files
+            .filter(file => file.name.endsWith('.html'))
+            .map(file => ({
+              title: file.name.replace('.html', '').replace(/-/g, ' ').toUpperCase(),
+              desc: 'Static web application tool.',
+              url: `tools/${file.name}`,
+              icon: '⚡',
+              tag: 'Web Tool'
+            }));
+          renderCards(allTools);
+        }
+      } catch (err) {
+        grid.innerHTML = `<p class="text-red-500 col-span-full text-center">Failed to load tools catalog.</p>`;
+      }
+    }
+
+    // Render HTML Cards
+    function renderCards(tools) {
+      const grid = document.getElementById('toolsGrid');
+      if (tools.length === 0) {
+        grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-10">No tools found matching your query.</p>`;
+        return;
+      }
+
+      grid.innerHTML = tools.map(tool => `
+        <div class="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition duration-200 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-3xl p-2 rounded-xl bg-gray-100 dark:bg-gray-700/50">${tool.icon || '🛠️'}</span>
+              <span class="text-xs font-medium px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                ${tool.tag || 'Tool'}
+              </span>
+            </div>
+            <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-gray-50 group-hover:text-blue-500 transition">
+              ${tool.title}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+              ${tool.desc}
+            </p>
+          </div>
+          <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700/50 flex justify-between items-center">
+            <a href="${tool.url}" target="_blank" class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              Launch App <span>→</span>
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Live Search Event
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = allTools.filter(t => 
+        t.title.toLowerCase().includes(query) || 
+        t.desc.toLowerCase().includes(query)
+      );
+      renderCards(filtered);
+    });
+
+    // Dark Mode Switcher logic
+    const themeBtn = document.getElementById('themeToggle');
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+    });
+
+    // Init
+    loadTools();
+  </script>
+</body>
+</html>
