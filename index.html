@@ -21,6 +21,7 @@
     --teal:#3A7D6C;
     --teal-soft:#E4EEEA;
     --amber-soft:#FBEBCE;
+    --danger:#B4432E;
     --radius:6px;
   }
   html.dark{
@@ -48,10 +49,15 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
   h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;}
   .mono{font-family:'IBM Plex Mono',monospace;}
+  button{font-family:inherit;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001s !important; transition-duration:0.001s !important;}
+  }
 
   /* header */
   header{
-    position:sticky;top:0;z-index:20;
+    position:sticky;top:0;z-index:30;
     background:color-mix(in srgb, var(--paper) 88%, transparent);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--border);
@@ -78,7 +84,12 @@
     mask-image:linear-gradient(to bottom, black, transparent 85%);
     pointer-events:none;
   }
-  .hero-inner{position:relative;max-width:640px;}
+  .hero-inner{
+    position:relative;max-width:640px;
+    opacity:0; transform:translateY(10px);
+    animation:heroIn .5s ease forwards;
+  }
+  @keyframes heroIn{to{opacity:1;transform:translateY(0);}}
   .hero h1{
     font-size:clamp(2.1rem, 4vw, 2.9rem);
     line-height:1.12;
@@ -109,45 +120,70 @@
     width:100%;
   }
   #searchInput::placeholder{color:var(--muted);}
+  .kbd{
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;
+    border:1px solid var(--border);border-radius:4px;padding:2px 6px;
+    color:var(--muted);flex-shrink:0;
+  }
   .count-line{
     margin-top:14px;font-size:0.8rem;color:var(--muted);
     display:flex;align-items:center;gap:6px;
   }
   .count-line .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);}
 
-  /* filters */
-  .filters{
-    display:flex;flex-wrap:wrap;gap:8px;
-    padding:22px 0;
-    border-bottom:1px solid var(--border);
+  /* recents */
+  .recents-wrap{border-bottom:1px solid var(--border);padding:16px 0;}
+  .recents-label{font-size:0.72rem;color:var(--muted);margin-bottom:10px;}
+  .recents-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin;}
+  .recent-chip{
+    display:flex;align-items:center;gap:8px;flex-shrink:0;
+    padding:8px 14px 8px 10px;border:1.3px solid var(--border);border-radius:20px;
+    background:var(--surface);color:var(--ink);text-decoration:none;font-size:0.83rem;
+    transition:border-color .12s ease;
   }
+  .recent-chip:hover{border-color:var(--teal);}
+  .recent-chip .r-icon{font-size:1rem;}
+
+  /* controls row */
+  .controls-row{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+    padding:22px 0;border-bottom:1px solid var(--border);
+  }
+  .filters{display:flex;flex-wrap:wrap;gap:8px;}
   .chip{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.78rem;
-    padding:7px 13px;
-    border-radius:20px;
-    border:1.3px solid var(--border);
-    background:var(--surface);
-    color:var(--ink-soft);
-    cursor:pointer;
-    transition:all .12s ease;
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    padding:7px 13px;border-radius:20px;border:1.3px solid var(--border);
+    background:var(--surface);color:var(--ink-soft);cursor:pointer;transition:all .12s ease;
   }
   .chip:hover{border-color:var(--ink-soft);}
-  .chip.active{
-    background:var(--ink);
-    border-color:var(--ink);
-    color:var(--paper);
+  .chip.active{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+  .chip.fav-chip{border-color:var(--amber);color:var(--amber-ink);}
+  .chip.fav-chip.active{background:var(--amber);border-color:var(--amber);color:var(--amber-ink);}
+
+  .view-controls{display:flex;align-items:center;gap:10px;}
+  #sortSelect{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    border:1.3px solid var(--border);border-radius:20px;background:var(--surface);
+    color:var(--ink-soft);padding:7px 12px;cursor:pointer;
   }
+  .view-toggle{display:flex;border:1.3px solid var(--border);border-radius:20px;overflow:hidden;}
+  .view-btn{
+    border:none;background:var(--surface);color:var(--muted);width:34px;height:32px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.95rem;
+  }
+  .view-btn.active{background:var(--ink);color:var(--paper);}
+  .view-btn svg{width:15px;height:15px;}
 
   /* grid */
   main{padding:36px 0 80px;}
   #toolsGrid{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(268px, 1fr));
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
     gap:18px;
   }
+  .card-shell{position:relative;}
   .card{
-    position:relative;
+    position:relative;height:100%;
     background:var(--surface);
     border:1.5px solid var(--border);
     border-radius:var(--radius);
@@ -158,80 +194,89 @@
   }
   .card:hover{border-color:var(--amber);transform:translateY(-3px);}
   .card:hover .grommet{background:var(--amber);border-color:var(--amber);}
-  .card:hover .open-line::after{width:100%;}
+  .card:hover .open-label::after{width:100%;}
 
   .grommet{
-    position:absolute;top:-8px;left:20px;
-    width:15px;height:15px;border-radius:50%;
-    background:var(--paper);
-    border:1.5px solid var(--border);
-    transition:all .15s ease;
+    position:absolute;top:-8px;left:20px;width:15px;height:15px;border-radius:50%;
+    background:var(--paper);border:1.5px solid var(--border);transition:all .15s ease;
   }
-  .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+  .card-actions{
+    position:absolute;top:14px;right:14px;display:flex;gap:6px;z-index:2;
+  }
+  .icon-btn{
+    width:28px;height:28px;border-radius:50%;border:1.3px solid var(--border);
+    background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:0.8rem;transition:all .12s ease;
+  }
+  .icon-btn:hover{border-color:var(--ink);color:var(--ink);}
+  .icon-btn.fav-btn.is-fav{background:var(--amber);border-color:var(--amber);color:var(--amber-ink);}
+
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;padding-right:60px;}
   .icon-swatch{
-    width:44px;height:44px;
-    border:1.3px solid var(--border);
-    border-radius:5px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.3rem;
-    background:var(--paper);
+    width:44px;height:44px;border:1.3px solid var(--border);border-radius:5px;
+    display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paper);flex-shrink:0;
   }
   .tag-pill{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.68rem;
-    padding:4px 9px;
-    border-radius:4px;
-    white-space:nowrap;
-    background:var(--teal-soft);
-    color:var(--teal);
+    font-family:'IBM Plex Mono',monospace;font-size:0.68rem;padding:4px 9px;border-radius:4px;
+    white-space:nowrap;background:var(--teal-soft);color:var(--teal);
   }
   .tag-pill.alt{background:var(--amber-soft);color:var(--amber-ink);}
   .card h3{font-size:1.05rem;font-weight:600;margin-bottom:6px;letter-spacing:-0.01em;}
-  .card p{
-    font-size:0.87rem;line-height:1.5;color:var(--muted);
-    margin:0 0 18px;
-    flex-grow:1;
+  .card p{font-size:0.87rem;line-height:1.5;color:var(--muted);margin:0 0 18px;flex-grow:1;}
+  .card-footer{
+    display:flex;justify-content:space-between;align-items:center;
+    padding-top:14px;border-top:1px solid var(--border);
   }
-  .open-line{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.78rem;
-    font-weight:500;
-    color:var(--ink);
-    padding-top:14px;
-    border-top:1px solid var(--border);
-    position:relative;
+  .open-label{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;font-weight:500;color:var(--ink);position:relative;
   }
-  .open-line::after{
-    content:"";position:absolute;bottom:-1px;left:0;height:1.5px;width:0%;
+  .open-label::after{
+    content:"";position:absolute;bottom:-2px;left:0;height:1.5px;width:0%;
     background:var(--amber);transition:width .18s ease;
   }
+  .card-footer .fav-mark{color:var(--amber);font-size:0.8rem;opacity:0;transition:opacity .15s ease;}
+  .card-footer .fav-mark.show{opacity:1;}
 
-  .state-msg{
-    grid-column:1/-1;text-align:center;padding:48px 20px;
-    color:var(--muted);font-size:0.95rem;
+  /* list view */
+  #toolsGrid.list-view{grid-template-columns:1fr;}
+  #toolsGrid.list-view .card{
+    flex-direction:row;align-items:center;gap:16px;padding:14px 70px 14px 20px;
   }
-  .state-msg.error{color:#B4432E;}
+  #toolsGrid.list-view .card-top{margin-bottom:0;padding-right:0;flex-shrink:0;}
+  #toolsGrid.list-view .card > div:not(.card-top){flex-grow:1;}
+  #toolsGrid.list-view h3{margin-bottom:2px;}
+  #toolsGrid.list-view p{margin-bottom:0;-webkit-line-clamp:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
+  #toolsGrid.list-view .card-footer{border-top:none;padding-top:0;flex-shrink:0;padding-left:16px;}
+  #toolsGrid.list-view .grommet{display:none;}
+
+  .state-msg{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--muted);font-size:0.95rem;}
+  .state-msg.error{color:var(--danger);}
 
   .skeleton{
     height:170px;border-radius:var(--radius);
     background:linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%);
-    background-size:200% 100%;
-    animation:shimmer 1.4s infinite;
-    border:1.5px solid var(--border);
+    background-size:200% 100%;animation:shimmer 1.4s infinite;border:1.5px solid var(--border);
   }
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
   footer{border-top:1px solid var(--border);padding:26px 0;}
-  footer .wrap{
-    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-    font-size:0.82rem;color:var(--muted);
-  }
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:0.82rem;color:var(--muted);}
   footer a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--border);}
   footer a:hover{border-color:var(--amber);color:var(--amber-ink);}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);font-size:0.85rem;padding:11px 20px;border-radius:20px;
+    opacity:0;pointer-events:none;transition:all .2s ease;z-index:50;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
   @media (max-width:520px){
     .hero{padding:44px 0 30px;}
     .header-row{padding:14px 0;}
+    .card-top{padding-right:0;}
+    .card-actions{position:static;justify-content:flex-end;margin-bottom:-6px;order:-1;}
   }
 </style>
 </head>
@@ -259,13 +304,33 @@
     <div class="search-shell">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input type="text" id="searchInput" placeholder="Search tools" />
+      <span class="kbd">/</span>
     </div>
     <div class="count-line"><span class="dot"></span><span id="countText" class="mono">Loading tools…</span></div>
   </div>
 </section>
 
-<div class="wrap">
+<div class="wrap recents-wrap" id="recentsWrap" style="display:none;">
+  <div class="recents-label mono">Recently opened</div>
+  <div class="recents-row" id="recentsRow"></div>
+</div>
+
+<div class="wrap controls-row">
   <div class="filters" id="filterRow"></div>
+  <div class="view-controls">
+    <select id="sortSelect" class="mono" aria-label="Sort tools">
+      <option value="name">Sort: Name</option>
+      <option value="category">Sort: Category</option>
+    </select>
+    <div class="view-toggle" role="group" aria-label="Layout">
+      <button class="view-btn active" data-view="grid" aria-label="Grid view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </button>
+      <button class="view-btn" data-view="list" aria-label="List view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
 </div>
 
 <main class="wrap">
@@ -279,9 +344,11 @@
 <footer>
   <div class="wrap">
     <span>Every tool here runs entirely in your browser.</span>
-    <a href="https://github.com/bishnulamsal/app" target="_blank" rel="noopener">View source on GitHub</a>
+    <a href="https://bishnulamsal.com.np" target="_blank" rel="noopener">View source on Admin</a>
   </div>
 </footer>
+
+<div class="toast" id="toast"></div>
 
 <script>
   const GITHUB_USER = 'bishnulamsal';
@@ -289,117 +356,271 @@
 
   let allTools = [];
   let activeTag = 'All';
+  let showFavoritesOnly = false;
   let query = '';
+  let sortBy = 'name';
+  let viewMode = 'grid';
+  let favorites = [];
+  let recents = [];
 
-  async function loadToolsCatalog() {
+  /* ---------- storage helper: window.storage (artifact) -> localStorage (real site) -> memory ---------- */
+  const Store = {
+    async get(key, fallback){
+      try{
+        if (window.storage){
+          const r = await window.storage.get(key);
+          return r ? JSON.parse(r.value) : fallback;
+        }
+      }catch(e){ /* key absent or storage unavailable */ }
+      try{
+        const v = localStorage.getItem(key);
+        return v !== null ? JSON.parse(v) : fallback;
+      }catch(e){}
+      return fallback;
+    },
+    async set(key, value){
+      try{
+        if (window.storage){ await window.storage.set(key, JSON.stringify(value)); return; }
+      }catch(e){}
+      try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+    }
+  };
+
+  /* ---------- load ---------- */
+  async function init(){
+    const [tools, favs, rec, theme, view] = await Promise.all([
+      loadToolsCatalog(),
+      Store.get('favorites', []),
+      Store.get('recents', []),
+      Store.get('theme-pref', null),
+      Store.get('view-pref', 'grid')
+    ]);
+    favorites = favs || [];
+    recents = rec || [];
+    viewMode = view || 'grid';
+
+    if (theme) {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+    document.getElementById('themeToggle').textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+
+    if (viewMode === 'list') setView('list', false);
+
+    if (allTools.length){
+      buildFilters();
+      renderRecents();
+      applyFilters();
+    }
+  }
+
+  async function loadToolsCatalog(){
     try {
       const res = await fetch('tools.json?cache=' + Date.now());
-      if (res.ok) {
-        allTools = await res.json();
-        afterLoad();
-        return;
-      }
+      if (res.ok) { allTools = await res.json(); return allTools; }
       const apiRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/tools`);
       if (apiRes.ok) {
         const files = await apiRes.json();
-        allTools = files
-          .filter(f => f.name.endsWith('.html'))
-          .map(f => ({
-            title: f.name.replace('.html', '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-            desc: 'A static, client-side web tool.',
-            url: `tools/${f.name}`,
-            icon: '🛠️',
-            tag: 'Tool'
-          }));
-        afterLoad();
-      } else {
-        throw new Error('no source');
+        allTools = files.filter(f => f.name.endsWith('.html')).map(f => ({
+          title: f.name.replace('.html', '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+          desc: 'A static, client-side web tool.',
+          url: `tools/${f.name}`, icon: '🛠️', tag: 'Tool'
+        }));
+        return allTools;
       }
+      throw new Error('no source');
     } catch (err) {
       document.getElementById('toolsGrid').innerHTML =
         `<div class="state-msg error">Couldn't load the tools list. Check the tools.json path and try again.</div>`;
       document.getElementById('countText').textContent = 'Failed to load';
+      return [];
     }
   }
 
-  function afterLoad() {
-    buildFilters();
-    renderCards(allTools);
-    updateCount(allTools.length);
-  }
-
-  function buildFilters() {
+  /* ---------- filters / sort ---------- */
+  function buildFilters(){
     const tags = ['All', ...new Set(allTools.map(t => t.tag || 'Utility'))];
     const row = document.getElementById('filterRow');
-    row.innerHTML = tags.map(tag =>
-      `<button class="chip ${tag === activeTag ? 'active' : ''}" data-tag="${tag}">${tag}</button>`
-    ).join('');
-    row.querySelectorAll('.chip').forEach(btn => {
+    row.innerHTML = `<button class="chip fav-chip" id="favChip">★ Favorites</button>` +
+      tags.map(tag => `<button class="chip ${tag === activeTag ? 'active' : ''}" data-tag="${tag}">${tag}</button>`).join('');
+
+    row.querySelectorAll('.chip[data-tag]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeTag = btn.dataset.tag;
-        row.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b === btn));
+        showFavoritesOnly = false;
+        document.getElementById('favChip').classList.remove('active');
+        row.querySelectorAll('[data-tag]').forEach(b => b.classList.toggle('active', b === btn));
         applyFilters();
       });
     });
-  }
-
-  function applyFilters() {
-    const filtered = allTools.filter(t => {
-      const matchesTag = activeTag === 'All' || (t.tag || 'Utility') === activeTag;
-      const matchesQuery = !query ||
-        t.title.toLowerCase().includes(query) ||
-        (t.desc && t.desc.toLowerCase().includes(query));
-      return matchesTag && matchesQuery;
+    document.getElementById('favChip').addEventListener('click', () => {
+      showFavoritesOnly = !showFavoritesOnly;
+      document.getElementById('favChip').classList.toggle('active', showFavoritesOnly);
+      applyFilters();
     });
-    renderCards(filtered);
-    updateCount(filtered.length, true);
   }
 
-  function updateCount(n, isFiltered) {
+  function applyFilters(){
+    let list = allTools.filter(t => {
+      const matchesTag = activeTag === 'All' || (t.tag || 'Utility') === activeTag;
+      const matchesQuery = !query || t.title.toLowerCase().includes(query) || (t.desc && t.desc.toLowerCase().includes(query));
+      const matchesFav = !showFavoritesOnly || favorites.includes(t.url);
+      return matchesTag && matchesQuery && matchesFav;
+    });
+    list = sortTools(list);
+    renderCards(list);
+    updateCount(list.length);
+    renderRecents();
+  }
+
+  function sortTools(list){
+    const copy = [...list];
+    if (sortBy === 'name') copy.sort((a,b) => a.title.localeCompare(b.title));
+    if (sortBy === 'category') copy.sort((a,b) => (a.tag||'').localeCompare(b.tag||'') || a.title.localeCompare(b.title));
+    return copy;
+  }
+
+  function updateCount(n){
     const el = document.getElementById('countText');
     if (n === 0) { el.textContent = 'No matches'; return; }
-    el.textContent = `${n} tool${n === 1 ? '' : 's'}${isFiltered ? ' shown' : ' on the shelf'}`;
+    const filtered = query || activeTag !== 'All' || showFavoritesOnly;
+    el.textContent = `${n} tool${n === 1 ? '' : 's'}${filtered ? ' shown' : ' on the shelf'}`;
   }
 
-  function renderCards(tools) {
+  /* ---------- render ---------- */
+  function renderCards(tools){
     const grid = document.getElementById('toolsGrid');
-    if (!tools || tools.length === 0) {
-      grid.innerHTML = query
-        ? `<div class="state-msg">No matches for “${query}”. Try a different search term.</div>`
-        : `<div class="state-msg">No tools yet — add HTML files to the <span class="mono">tools/</span> folder to see them here.</div>`;
+    if (!tools || tools.length === 0){
+      let msg = `No tools yet — add HTML files to the <span class="mono">tools/</span> folder to see them here.`;
+      if (query) msg = `No matches for "${query}". Try a different search term.`;
+      else if (showFavoritesOnly) msg = `No favorites yet — tap the star on a tool to pin it here.`;
+      grid.innerHTML = `<div class="state-msg">${msg}</div>`;
       return;
     }
-    grid.innerHTML = tools.map((tool, i) => `
-      <a href="${tool.url}" class="card">
-        <span class="grommet"></span>
-        <div class="card-top">
-          <span class="icon-swatch">${tool.icon || '⚡'}</span>
-          <span class="tag-pill ${i % 2 ? 'alt' : ''}">${tool.tag || 'Utility'}</span>
+    grid.innerHTML = tools.map((tool, i) => {
+      const isFav = favorites.includes(tool.url);
+      return `
+      <div class="card-shell">
+        <a href="${tool.url}" class="card" data-url="${tool.url}" data-title="${tool.title.replace(/"/g,'&quot;')}" data-icon="${tool.icon||'⚡'}">
+          <span class="grommet"></span>
+          <div class="card-top">
+            <span class="icon-swatch">${tool.icon || '⚡'}</span>
+            <span class="tag-pill ${i % 2 ? 'alt' : ''}">${tool.tag || 'Utility'}</span>
+          </div>
+          <div>
+            <h3>${tool.title}</h3>
+            <p>${tool.desc || 'A fast, lightweight client-side web application.'}</p>
+          </div>
+          <div class="card-footer">
+            <span class="open-label">Open tool</span>
+            <span class="fav-mark ${isFav ? 'show' : ''}">★ pinned</span>
+          </div>
+        </a>
+        <div class="card-actions">
+          <button class="icon-btn fav-btn ${isFav ? 'is-fav' : ''}" data-action="fav" data-url="${tool.url}" aria-label="Toggle favorite">★</button>
+          <button class="icon-btn copy-btn" data-action="copy" data-url="${tool.url}" aria-label="Copy link">⧉</button>
         </div>
-        <h3>${tool.title}</h3>
-        <p>${tool.desc || 'A fast, lightweight client-side web application.'}</p>
-        <span class="open-line">Open tool</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderRecents(){
+    const wrap = document.getElementById('recentsWrap');
+    const row = document.getElementById('recentsRow');
+    if (!recents.length || query || activeTag !== 'All' || showFavoritesOnly){
+      wrap.style.display = 'none';
+      return;
+    }
+    wrap.style.display = 'block';
+    row.innerHTML = recents.slice(0,6).map(r => `
+      <a class="recent-chip" href="${r.url}">
+        <span class="r-icon">${r.icon || '⚡'}</span>${r.title}
       </a>
     `).join('');
   }
 
+  /* ---------- actions: favorite / copy / open tracking ---------- */
+  document.getElementById('toolsGrid').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (btn) {
+      e.preventDefault();
+      const url = btn.dataset.url;
+      if (btn.dataset.action === 'fav') {
+        favorites = favorites.includes(url) ? favorites.filter(u => u !== url) : [...favorites, url];
+        await Store.set('favorites', favorites);
+        applyFilters();
+        showToast(favorites.includes(url) ? 'Added to favorites' : 'Removed from favorites');
+      }
+      if (btn.dataset.action === 'copy') {
+        const full = new URL(url, window.location.href).href;
+        try { await navigator.clipboard.writeText(full); showToast('Link copied'); }
+        catch(e){ showToast('Could not copy link'); }
+      }
+      return;
+    }
+    const card = e.target.closest('.card');
+    if (card) {
+      const entry = { url: card.dataset.url, title: card.dataset.title, icon: card.dataset.icon };
+      recents = [entry, ...recents.filter(r => r.url !== entry.url)].slice(0, 6);
+      Store.set('recents', recents); // fire-and-forget so navigation isn't delayed
+    }
+  });
+
+  /* ---------- search / sort / view ---------- */
   document.getElementById('searchInput').addEventListener('input', (e) => {
     query = e.target.value.toLowerCase().trim();
     applyFilters();
   });
 
-  // Theme (in-memory only — no localStorage inside the preview sandbox)
-  const themeBtn = document.getElementById('themeToggle');
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.classList.add('dark');
-    themeBtn.textContent = '☀️';
-  }
-  themeBtn.addEventListener('click', () => {
-    const isDark = document.documentElement.classList.toggle('dark');
-    themeBtn.textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('sortSelect').addEventListener('change', (e) => {
+    sortBy = e.target.value;
+    applyFilters();
   });
 
-  loadToolsCatalog();
+  function setView(mode, persist = true){
+    viewMode = mode;
+    document.getElementById('toolsGrid').classList.toggle('list-view', mode === 'list');
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === mode));
+    if (persist) Store.set('view-pref', mode);
+  }
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => setView(btn.dataset.view));
+  });
+
+  /* ---------- keyboard shortcuts ---------- */
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement.tagName;
+    if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+      e.preventDefault();
+      document.getElementById('searchInput').focus();
+    }
+    if (e.key === 'Escape' && tag === 'INPUT') {
+      document.getElementById('searchInput').value = '';
+      query = '';
+      document.activeElement.blur();
+      applyFilters();
+    }
+  });
+
+  /* ---------- toast ---------- */
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  /* ---------- theme ---------- */
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+    Store.set('theme-pref', isDark ? 'dark' : 'light');
+  });
+
+  init();
 </script>
 </body>
 </html>
