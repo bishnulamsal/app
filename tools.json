@@ -57,9 +57,9 @@
   },
   {
     "title": "Unicode ⇄ Preeti — नेपाली फन्ट कन्भर्टर",
-    "desc": "Fast and lightweight client-side web application.",
+    "desc": "Fast client-side Unicode Nepali to Preeti text converter.",
     "url": "tools/unicode-to-preeti-converter.html",
-    "icon": "⚡",
-    "tag": "Utility"
+    "icon": "⇄",
+    "tag": "Unicode to Preeti"
   }
 ]
