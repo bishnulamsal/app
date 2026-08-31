@@ -8,10 +8,10 @@
   },
   {
     "title": "Dork Search - Search Everything",
-    "desc": "Fast and lightweight client-side web application.",
+    "desc": "Fast client-side file, movie, pdf, and everything dork search.",
     "url": "tools/everything-search.html",
-    "icon": "⚡",
-    "tag": "Utility"
+    "icon": "🔎",
+    "tag": "Search"
   },
   {
     "title": "Page Not Found - Redirecting...",
