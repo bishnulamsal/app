@@ -36,10 +36,10 @@
   },
   {
     "title": "Preeti ⇄ Unicode — नेपाली फन्ट कन्भर्टर",
-    "desc": "Fast and lightweight client-side web application.",
+    "desc": "Fast client-side preeti to Unicode Romanized Nepali text converter.",
     "url": "tools/preeti-to-unicode-converter.html",
-    "icon": "⚡",
-    "tag": "Utility"
+    "icon": "🇳🇵-🇪🇳",
+    "tag": "Converter"
   },
   {
     "title": "Roman ⇄ Unicode — नेपाली फन्ट कन्भर्टर",
