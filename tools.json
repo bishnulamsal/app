@@ -1,5 +1,12 @@
 [
   {
+    "title": "Plus UI Studio v4.0 - Advanced Blogger Thumbnail Generator",
+    "desc": "Static web application tool.",
+    "url": "tools/post-thumbnail-generator.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Unicode",
     "desc": "Static web application tool.",
     "url": "tools/unicode.html",
