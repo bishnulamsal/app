@@ -7,6 +7,13 @@
     "tag": "Utility"
   },
   {
+    "title": "Index",
+    "desc": "Static web application tool.",
+    "url": "tools/index.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "BTV Nepal — Live TV",
     "desc": "Static web application tool.",
     "url": "tools/iptv-bishnulamsal-tv.html",
