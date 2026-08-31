@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Nepali Unicode Converter",
+    "desc": "Easily convert Romanized Nepali text to Nepali Unicode script instantly.",
+    "url": "tools/unicode.html",
+    "icon": "📝",
+    "tag": "Converter"
+  },
+  {
+    "title": "URL Shortener Tool",
+    "desc": "Create fast and custom lightweight short links dynamically.",
+    "url": "tools/url-shortener.html",
+    "icon": "🔗",
+    "tag": "Utility"
+  }
+]
