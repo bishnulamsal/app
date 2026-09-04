@@ -1,5 +1,12 @@
 [
   {
+    "title": "PromptOS · Bishnu Lamsal AI Prompt Command Center",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/chatgpt.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Photography Live Simulator",
     "desc": "Photography Live Simulator · All effects rendered on real photo · No data collected.",
     "url": "tools/depth-of-field-simulator.html",
