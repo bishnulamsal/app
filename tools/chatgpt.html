@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="PromptOS by Bishnu Lamsal · Premium AI Prompt Command Center for 252 visual prompt codewords.">
+<meta name="theme-color" content="#f7f8fc" id="themeColor">
+<meta name="color-scheme" content="light dark">
+<meta name="author" content="Bishnu Lamsal">
+<meta property="og:title" content="PromptOS · Bishnu Lamsal AI Prompt Command Center">
+<meta property="og:description" content="Explore, search, save and compose 252 visual prompt codewords.">
+<meta property="og:url" content="https://www.bishnulamsal.com.np/">
+<link rel="icon" href="https://www.bishnulamsal.com.np/favicon.ico">
+<link rel="apple-touch-icon" href="https://www.bishnulamsal.com.np/favicon.ico">
+<link rel="manifest" href="https://bishnulamsal.github.io/chatgpt/manifest.webmanifest">
+<title>PromptOS · Bishnu Lamsal AI Prompt Command Center</title><link rel="stylesheet" href="https://bishnulamsal.github.io/chatgpt/style.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark"><img src="https://www.bishnulamsal.com.np/favicon.ico" alt="Bishnu Lamsal"></div><div><strong>PromptOS</strong><span>by Bishnu Lamsal</span></div></div>
+  <div class="workspace"><span class="dot"></span> Visual Codebook <small>252</small></div>
+  <nav class="nav">
+    <div class="nav-label">Workspace</div>
+    <button class="nav-item active" data-view="dashboard"><span>⌂</span> Dashboard</button>
+    <button class="nav-item" data-view="commands"><span>⌘</span> All Commands</button>
+    <button class="nav-item" data-view="favorites"><span>★</span> Favorites <b id="sideFav">0</b></button>
+    <button class="nav-item" data-view="categories"><span>◈</span> Categories</button>
+    <div class="nav-label">Tools</div>
+    <button class="nav-item" data-view="builder"><span>⚡</span> Prompt Builder</button>
+    <button class="nav-item" data-view="recent"><span>◷</span> Recently Used</button>
+    <div class="nav-label">System</div>
+    <button class="nav-item" data-view="about"><span>ⓘ</span> About Codebook</button>
+  </nav>
+  <div class="sidebar-foot"><div class="status"><i></i> Local workspace</div><button id="export" class="ghost full">Export favorites ↗</button><a class="admin-link" href="https://www.bishnulamsal.com.np" target="_blank" rel="noopener"><span>⌁</span> Admin / Website <b>↗</b></a></div>
+</aside>
+
+<main class="main">
+<header class="topbar"><button class="mobile-menu" id="menu">☰</button><div><div class="crumb">WORKSPACE / <span id="crumb">DASHBOARD</span></div><h1 id="pageTitle">Command Dashboard</h1></div><div class="top-actions"><button class="icon-button" id="random" title="Random command">⤨</button><button class="icon-button" id="themeToggle" title="Toggle theme">☾</button><a class="avatar admin-avatar" href="https://www.bishnulamsal.com.np" target="_blank" rel="noopener" title="Open Bishnu Lamsal website"><img src="https://www.bishnulamsal.com.np/favicon.ico" alt="Admin"></a></div></header>
+
+<section id="dashboard" class="view active-view">
+  <div class="hero-grid">
+    <div class="hero-panel"><div class="orb"></div><div class="eyebrow">Prompt intelligence workspace</div><h2>Build better visual prompts,<br><em>faster.</em></h2><p>Explore 252 custom visual codewords, save your favorites, assemble command stacks, and copy ready-to-use prompt triggers.</p><div class="hero-search"><span>⌕</span><input id="globalSearch" placeholder="Search commands, purposes, categories..." autocomplete="off"><kbd>/</kbd></div><div class="quick"><button data-view="commands">Browse all commands <span>→</span></button><button data-view="builder">Open Prompt Builder <span>↗</span></button></div></div>
+    <div class="focus-card"><div class="mini-head"><span>Command of the moment</span><button id="focusStar">☆</button></div><div id="focusCommand"></div><button class="focus-copy" id="focusCopy">Copy command</button></div>
+  </div>
+  <div class="stats-row"><div class="metric"><span class="metric-icon">⌘</span><div><b id="total">252</b><small>Total commands</small></div></div><div class="metric"><span class="metric-icon">◈</span><div><b id="categories">21</b><small>Categories</small></div></div><div class="metric"><span class="metric-icon">★</span><div><b id="favorites">0</b><small>Saved favorites</small></div></div><div class="metric"><span class="metric-icon">◷</span><div><b id="recentCount">0</b><small>Recently used</small></div></div></div>
+  <div class="section-head"><div><span class="eyebrow">Explore</span><h3>Browse by capability</h3></div><button class="text-button" data-view="categories">View all →</button></div><div class="category-grid" id="categoryGrid"></div>
+  <div class="section-head"><div><span class="eyebrow">Curated</span><h3>Popular starting points</h3></div><button class="text-button" data-view="commands">Open directory →</button></div><div class="command-strip" id="popular"></div>
+</section>
+
+<section id="commands" class="view"><div class="page-intro"><div><span class="eyebrow">Command library</span><h2>All visual commands</h2><p>Search the full codebook by trigger, purpose, or capability.</p></div><button class="btn primary" id="random2">⤨ Random command</button></div><div class="toolbar"><div class="searchbox"><span>⌕</span><input id="search" placeholder="Search /code, purpose, category..."><kbd>/</kbd></div><select id="category"></select><select id="sort"><option value="number">Newest index</option><option value="alpha">A–Z</option><option value="purpose">Purpose</option></select><div class="view-toggle"><button id="gridBtn" class="active">▦</button><button id="listBtn">☰</button></div></div><div class="result-meta"><span id="resultCount"></span><button class="text-button" id="clear">Reset filters</button></div><div class="command-grid" id="grid"></div><div class="pagination"><button class="btn" id="prev">←</button><span id="page"></span><button class="btn" id="next">→</button></div></section>
+
+<section id="favorites" class="view"><div class="page-intro"><div><span class="eyebrow">Your collection</span><h2>Saved commands</h2><p>Keep your most useful visual prompt triggers one click away.</p></div><button class="btn" id="export2">Export JSON ↗</button></div><div class="command-grid" id="favGrid"></div></section>
+<section id="categories" class="view"><div class="page-intro"><div><span class="eyebrow">Capability map</span><h2>Categories</h2><p>Jump into a focused set of visual transformations.</p></div></div><div class="category-grid large" id="allCategories"></div></section>
+<section id="builder" class="view"><div class="page-intro"><div><span class="eyebrow">Command composer</span><h2>Prompt Builder</h2><p>Stack several source codewords into one visual workflow.</p></div></div><div class="builder-layout"><div class="builder-panel"><div class="panel-head"><h3>Build your command stack</h3><span id="stackCount">0 / 6</span></div><div id="stack" class="stack"></div><div class="builder-search"><span>⌕</span><input id="builderSearch" placeholder="Find a code to add..."></div><div id="builderResults" class="builder-results"></div></div><div class="preview-panel"><span class="eyebrow">Live output</span><h3>Ready-to-copy prompt</h3><div class="prompt-preview" id="promptPreview">Add commands from the left to start building.</div><button class="btn primary full" id="copyStack">Copy prompt stack</button><button class="btn full" id="clearStack">Clear stack</button></div></div></section>
+<section id="recent" class="view"><div class="page-intro"><div><span class="eyebrow">Activity</span><h2>Recently used</h2><p>Your latest command interactions are stored locally in this browser.</p></div></div><div class="command-grid" id="recentGrid"></div></section>
+<section id="about" class="view"><div class="page-intro"><div><span class="eyebrow">Reference</span><h2>About the codebook</h2><p>A premium interface for the supplied “200+ SECRET CODES FOR CHATGPT” source.</p></div></div><div class="about-card"><div class="about-icon">✦</div><h3>252 custom visual prompt labels</h3><p>This directory preserves the source codewords, numbering, categories, and purposes from the supplied PDF. The source describes these as custom prompt labels, not official ChatGPT commands.</p><div class="about-grid"><div><b>252</b><span>source entries</span></div><div><b>21</b><span>capability groups</span></div><div><b>Offline</b><span>no backend required</span></div><div><b>Local</b><span>favorites & history</span></div></div><div class="brand-credit"><img src="https://www.bishnulamsal.com.np/favicon.ico" alt="Bishnu Lamsal"><div><b>Bishnu Lamsal</b><span>Digital creativity · AI · UX/UI · Nepal</span></div><a href="https://www.bishnulamsal.com.np" target="_blank" rel="noopener">Visit website ↗</a></div></div></section>
+<footer>PromptOS · <a href="https://www.bishnulamsal.com.np" target="_blank" rel="noopener">Bishnu Lamsal</a> · Favorites and history stay in your browser</footer>
+</main></div>
+<div class="modal" id="modal"><div class="modal-box"><button class="modal-close" id="close">×</button><div id="modalBody"></div></div></div><div class="toast" id="toast"></div>
+<script src="https://bishnulamsal.github.io/chatgpt/data.js"></script><script src="https://bishnulamsal.github.io/chatgpt/app.js"></script>
+</body></html>
