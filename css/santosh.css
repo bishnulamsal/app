@@ -645,7 +645,7 @@
         }
 
         .contact-form {
-            background: var(--card);
+            background: #bc96374d;
             padding: 45px;
             border-radius: 24px;
             border: 1px solid rgba(212,168,67,0.08);
