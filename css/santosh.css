@@ -344,6 +344,7 @@
           /* 1. Define dimensions */
           width: 100%;
           max-width: 400px;
+         height: 300px;
           
         
           /* 2. Prevent squishing/distortion (Acts like background-size: cover) */
