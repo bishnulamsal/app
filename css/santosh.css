@@ -341,22 +341,22 @@
 
      
         .profile-pic {
-  /* 1. Define dimensions */
-  width: 100%;
-  max-width: 400px;
-  height: 300px;
-
-  /* 2. Prevent squishing/distortion (Acts like background-size: cover) */
-  object-fit: cover;
-
-  /* 3. Center the image inside its container (optional) */
-  display: block;
-  margin: 0 auto;
-
-  /* 4. Add styling flourishes (optional) */
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+          /* 1. Define dimensions */
+          width: 100%;
+          max-width: 400px;
+          
+        
+          /* 2. Prevent squishing/distortion (Acts like background-size: cover) */
+          object-fit: cover;
+        
+          /* 3. Center the image inside its container (optional) */
+          display: block;
+          margin: 0 auto;
+        
+          /* 4. Add styling flourishes (optional) */
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
         .about-image-frame .avatar {
             font-size: 6.5rem;
