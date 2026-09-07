@@ -340,31 +340,23 @@
 
 
      
-        .profile-pic {
-          /* 1. Define dimensions */
-          width: 100%;
-          max-width: 450px;
-         height: 350px;
-          
-        
-          /* 2. Prevent squishing/distortion (Acts like background-size: cover) */
-          object-fit: cover;
-        
-          /* 3. Center the image inside its container (optional) */
-          display: block;
-          margin: 0 auto;
-        
-          /* 4. Add styling flourishes (optional) */
-          border-radius: 8px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
+  
         .about-image-frame .avatar {
             font-size: 6.5rem;
             margin-top: 20px;
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
         }
 
+.profile-pic {
+          width: 100%;
+          max-width: 450px;
+          height: 350px;
+          object-fit: cover;
+          display: block;
+          margin: 0 auto;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
         .about-image-frame .name-display {
             font-size: 1.05rem;
             font-weight: 700;
