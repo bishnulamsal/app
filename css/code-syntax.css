@@ -1,0 +1,356 @@
+<!-- =========================
+     BISHNU CODEBOX - CSS
+     INSTALL ONCE IN BLOGGER
+     ========================= -->
+
+<link href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.2/styles/github-dark.min.css' rel='stylesheet'/>
+
+<style>
+/* ===== Main CodeBox ===== */
+.bl-codebox{
+  --bl-bg:#0d1117;
+  --bl-header:#161b22;
+  --bl-border:#30363d;
+  --bl-text:#e6edf3;
+  --bl-muted:#8b949e;
+  --bl-hover:#21262d;
+  --bl-green:#3fb950;
+
+  width:100%;
+  margin:28px 0;
+  overflow:hidden;
+  border:1px solid var(--bl-border);
+  border-radius:14px;
+  background:var(--bl-bg);
+  color:var(--bl-text);
+  box-shadow:0 8px 28px rgba(0,0,0,.12);
+  box-sizing:border-box;
+  font-family:Consolas,Monaco,"Courier New",monospace;
+}
+
+/* ===== Header ===== */
+.bl-codebox-header{
+  min-height:62px;
+  padding:9px 10px 9px 17px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  background:var(--bl-header);
+  border-bottom:1px solid var(--bl-border);
+  box-sizing:border-box;
+}
+
+/* ===== File Information ===== */
+.bl-codebox-file{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  flex:1;
+}
+
+.bl-codebox-dot{
+  width:9px;
+  height:9px;
+  min-width:9px;
+  border-radius:50%;
+  background:var(--bl-green);
+  box-shadow:0 0 10px rgba(63,185,80,.65);
+}
+
+.bl-codebox-info{
+  min-width:0;
+}
+
+.bl-codebox-language{
+  display:block;
+  font-family:Arial,sans-serif;
+  font-size:14px;
+  line-height:18px;
+  font-weight:700;
+  color:var(--bl-text);
+}
+
+.bl-codebox-filename{
+  display:block;
+  max-width:240px;
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:13px;
+  color:var(--bl-muted);
+}
+
+/* ===== Toolbar ===== */
+.bl-codebox-tools{
+  display:flex;
+  align-items:center;
+  gap:3px;
+  flex-shrink:0;
+}
+
+.bl-codebox-btn{
+  position:relative;
+  width:40px;
+  height:40px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  border-radius:50%;
+  outline:none;
+  background:transparent;
+  color:var(--bl-text);
+  cursor:pointer;
+  transition:
+    background .18s ease,
+    transform .18s ease,
+    color .18s ease;
+}
+
+.bl-codebox-btn:hover{
+  background:var(--bl-hover);
+  transform:translateY(-1px);
+}
+
+.bl-codebox-btn:active{
+  transform:scale(.94);
+}
+
+.bl-codebox-btn svg{
+  width:19px;
+  height:19px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.bl-codebox-btn.success{
+  color:var(--bl-green);
+}
+
+/* ===== Tooltip ===== */
+.bl-codebox-btn::after{
+  content:attr(data-tip);
+  position:absolute;
+  left:50%;
+  bottom:-34px;
+  transform:translateX(-50%);
+  z-index:999999;
+  padding:5px 8px;
+  border-radius:5px;
+  background:#000;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  font-weight:400;
+  line-height:12px;
+  white-space:nowrap;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .15s ease;
+}
+
+.bl-codebox-btn:hover::after{
+  opacity:1;
+  visibility:visible;
+}
+
+/* ===== Code Area ===== */
+.bl-codebox-body{
+  max-height:650px;
+  overflow:auto;
+  background:var(--bl-bg);
+}
+
+.bl-codebox-body::-webkit-scrollbar{
+  width:9px;
+  height:9px;
+}
+
+.bl-codebox-body::-webkit-scrollbar-track{
+  background:var(--bl-bg);
+}
+
+.bl-codebox-body::-webkit-scrollbar-thumb{
+  background:#444c56;
+  border-radius:20px;
+}
+
+.bl-codebox-body::-webkit-scrollbar-thumb:hover{
+  background:#586069;
+}
+
+/* ===== Code Wrapper ===== */
+.bl-codebox-code{
+  display:flex;
+  width:max-content;
+  min-width:100%;
+  margin:0;
+  padding:20px 0;
+  box-sizing:border-box;
+  font-size:13px;
+  line-height:1.7;
+  tab-size:4;
+}
+
+/* ===== Line Numbers ===== */
+.bl-codebox-lines{
+  flex:0 0 58px;
+  width:58px;
+  box-sizing:border-box;
+  padding:0 14px 0 8px;
+  text-align:right;
+  color:var(--bl-muted);
+  border-right:1px solid var(--bl-border);
+  user-select:none;
+  pointer-events:none;
+  font-size:12px;
+  line-height:1.7;
+}
+
+/* ===== Highlighted Source ===== */
+.bl-codebox-source{
+  display:block;
+  margin:0;
+  padding:0 25px 0 20px;
+  min-width:0;
+  color:var(--bl-text);
+  background:transparent !important;
+  white-space:pre;
+  font-family:inherit;
+  font-size:inherit;
+  line-height:inherit;
+  tab-size:4;
+  box-sizing:border-box;
+}
+
+/* Make highlight.js background transparent */
+.bl-codebox-source.hljs{
+  padding:0 25px 0 20px;
+  background:transparent !important;
+}
+
+/* ===== Status Bar ===== */
+.bl-codebox-status{
+  min-height:31px;
+  padding:5px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  box-sizing:border-box;
+  background:var(--bl-header);
+  border-top:1px solid var(--bl-border);
+  color:var(--bl-muted);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:15px;
+}
+
+/* ===== Fullscreen ===== */
+.bl-codebox.fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:2147483647 !important;
+  width:100vw !important;
+  height:100vh !important;
+  margin:0 !important;
+  border-radius:0 !important;
+}
+
+.bl-codebox.fullscreen .bl-codebox-body{
+  height:calc(100vh - 94px);
+  max-height:none;
+}
+
+.bl-codebox.fullscreen .bl-codebox-header{
+  border-radius:0;
+}
+
+/* ===== Mobile ===== */
+@media(max-width:700px){
+
+  .bl-codebox{
+    margin:22px 0;
+    border-radius:11px;
+  }
+
+  .bl-codebox-header{
+    min-height:56px;
+    padding:8px 7px 8px 12px;
+    gap:6px;
+  }
+
+  .bl-codebox-dot{
+    width:8px;
+    height:8px;
+    min-width:8px;
+  }
+
+  .bl-codebox-language{
+    font-size:12px;
+    line-height:16px;
+  }
+
+  .bl-codebox-filename{
+    max-width:120px;
+    font-size:9px;
+  }
+
+  .bl-codebox-tools{
+    gap:0;
+  }
+
+  .bl-codebox-btn{
+    width:34px;
+    height:34px;
+  }
+
+  .bl-codebox-btn svg{
+    width:17px;
+    height:17px;
+  }
+
+  .bl-codebox-btn::after{
+    display:none;
+  }
+
+  .bl-codebox-body{
+    max-height:550px;
+  }
+
+  .bl-codebox-code{
+    padding:17px 0;
+    font-size:12px;
+    line-height:1.65;
+  }
+
+  .bl-codebox-lines{
+    flex-basis:45px;
+    width:45px;
+    padding-right:10px;
+    font-size:10px;
+    line-height:1.65;
+  }
+
+  .bl-codebox-source,
+  .bl-codebox-source.hljs{
+    padding-left:14px;
+    padding-right:18px;
+    line-height:1.65;
+  }
+
+  .bl-codebox-status{
+    font-size:9px;
+  }
+}
+</style>
