@@ -1,8 +1,4 @@
 
-
-<script>
-/*<![CDATA[*/
-
 (function(){
 
   "use strict";
@@ -962,5 +958,3 @@
 
 })();
 
-/*]]>*/
-</script>
