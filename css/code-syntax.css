@@ -159,7 +159,7 @@
 
 /* ===== Code Area ===== */
 .bl-codebox-body{
-  max-height:650px;
+  max-height:300px;
   overflow:auto;
   background:var(--bl-bg);
 }
