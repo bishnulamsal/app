@@ -1,9 +1,4 @@
-<!-- ==========================================
-     BISHNU CODEBOX - JAVASCRIPT
-     INSTALL ONCE IN BLOGGER
-     ========================================== -->
 
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.2/highlight.min.js'></script>
 
 <script>
 /*<![CDATA[*/
