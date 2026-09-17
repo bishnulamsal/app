@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AJAX Music Player - Blogger</title>
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+      },
+      boxShadow: {
+        soft: '0 25px 70px rgba(80, 65, 160, .14)'
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    background: #faf9f7;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(.2px);
+    pointer-events: none;
+  }
+
+  .blob-a {
+    width: 310px; height: 310px;
+    background: #5b7ff1;
+    left: -120px; top: -130px;
+  }
+
+  .blob-b {
+    width: 300px; height: 300px;
+    background: #5b7ff1;
+    right: -120px; bottom: -140px;
+  }
+
+  .blob-c {
+    width: 390px; height: 560px;
+    background: linear-gradient(140deg, rgba(217,250,242,.8), rgba(238,225,255,.7));
+    transform: rotate(18deg);
+    left: 25%; top: 12%;
+    border-radius: 45% 55% 40% 60%;
+    opacity: .7;
+  }
+
+  .dots {
+    background-image: radial-gradient(#5d5d5d 2px, transparent 2px);
+    background-size: 22px 22px;
+    width: 90px; height: 90px;
+    opacity: .85;
+  }
+
+  .player-card {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(255,255,255,.85);
+  }
+
+  .album-wrap.playing img {
+    animation: albumPulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes albumPulse {
+    0%,100% { transform: scale(1); box-shadow: 0 12px 28px rgba(0,0,0,.16); }
+    50% { transform: scale(1.025); box-shadow: 0 18px 38px rgba(91,127,241,.22); }
+  }
+
+  .equalizer span {
+    width: 4px;
+    height: 13px;
+    border-radius: 999px;
+    background: #6379e8;
+    transform-origin: bottom;
+  }
+
+  .equalizer.playing span {
+    animation: eq .8s ease-in-out infinite alternate;
+  }
+  .equalizer.playing span:nth-child(2) { animation-delay: -.35s; }
+  .equalizer.playing span:nth-child(3) { animation-delay: -.15s; }
+  .equalizer.playing span:nth-child(4) { animation-delay: -.5s; }
+  .equalizer.playing span:nth-child(5) { animation-delay: -.25s; }
+
+  @keyframes eq {
+    from { transform: scaleY(.35); }
+    to { transform: scaleY(1.7); }
+  }
+
+  .progress-track {
+    cursor: pointer;
+    height: 7px;
+    border-radius: 999px;
+    background: #e7e5e4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg,#a99af4,#657fe8);
+    transition: width .08s linear;
+  }
+
+  .control-btn {
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 22px rgba(98,83,200,.16);
+  }
+  .control-btn:active { transform: scale(.94); }
+
+  .play-btn {
+    background: #f0ecff;
+    color: #6655d7;
+  }
+
+  .playlist-item {
+    transition: background .2s ease, transform .2s ease;
+  }
+  .playlist-item:hover {
+    background: rgba(240,236,255,.7);
+    transform: translateX(2px);
+  }
+  .playlist-item.active {
+    background: linear-gradient(90deg,rgba(238,233,255,.95),rgba(248,246,255,.75));
+  }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @media (max-width: 640px) {
+    .blob-a { width: 220px; height: 220px; left: -90px; top: -100px; }
+    .blob-b { width: 220px; height: 220px; right: -100px; bottom: -100px; }
+    .blob-c { width: 260px; height: 470px; left: 14%; }
+  }
+</style>
+</head>
+
+<body>
+<div class="relative min-h-screen overflow-hidden flex items-center justify-center p-5 sm:p-8">
+
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+  <div class="dots absolute left-8 bottom-20"></div>
+  <div class="dots absolute right-16 top-12"></div>
+
+  <main class="relative z-10 w-full max-w-6xl">
+    <div class="grid lg:grid-cols-[1fr_430px] gap-8 lg:gap-14 items-center">
+
+      <!-- Left presentation area -->
+      <section class="px-2 sm:px-6">
+        <div class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-sm font-semibold text-indigo-600 shadow-sm border border-white">
+          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          AJAX MUSIC PLAYER
+        </div>
+
+        <h1 class="mt-6 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[.98]">
+          <span class="text-blue-600">Music Player</span><br>
+          <span class="text-slate-950">Plus UI</span>
+        </h1>
+
+        <p class="mt-6 max-w-xl text-slate-600 text-lg leading-8">
+          A modern Blogger-friendly music player with AJAX playlist loading,
+          smooth animations, album artwork, keyboard shortcuts, progress seeking,
+          volume control and automatic next-track playback.
+        </p>
+
+        <div class="mt-7 flex flex-wrap gap-3">
+          <span class="rounded-full bg-white px-4 py-2 text-sm font-medium shadow-sm">Tailwind CSS</span>
+          <span class="rounded-full bg-white px-4 py-2 text-sm font-medium shadow-sm">AJAX / Fetch</span>
+          <span class="rounded-full bg-white px-4 py-2 text-sm font-medium shadow-sm">Responsive</span>
+          <span class="rounded-full bg-white px-4 py-2 text-sm font-medium shadow-sm">No jQuery</span>
+        </div>
+      </section>
+
+      <!-- Player -->
+      <section class="player-card rounded-[34px] shadow-soft p-5 sm:p-7">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <p class="text-xs uppercase tracking-[.22em] font-bold text-indigo-500">Now Playing</p>
+            <p id="trackNumber" class="text-xs text-slate-400 mt-1">Track 1 of 3</p>
+          </div>
+
+          <div id="equalizer" class="equalizer flex items-end gap-1 h-6" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div id="albumWrap" class="album-wrap playing:animate-none rounded-[25px] overflow-hidden bg-slate-100 aspect-square shadow-lg">
+          <img id="cover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=900&q=85"
+               alt="Album artwork" class="w-full h-full object-cover transition duration-500">
+        </div>
+
+        <div class="mt-6">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h2 id="title" class="font-extrabold text-2xl text-slate-900 truncate">Bewajah</h2>
+              <p id="artist" class="mt-1 text-slate-500">Himesh Reshammiya</p>
+            </div>
+            <button id="likeBtn" class="control-btn shrink-0 h-10 w-10 rounded-full bg-white text-slate-400 shadow-sm" aria-label="Like">
+              ♡
+            </button>
+          </div>
+
+          <div class="mt-6 flex items-center gap-3 text-xs text-slate-500 font-medium">
+            <span id="currentTime">00:00</span>
+            <div id="progressTrack" class="progress-track flex-1" aria-label="Seek music">
+              <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <span id="duration">00:00</span>
+          </div>
+
+          <div class="mt-6 flex items-center justify-center gap-5">
+            <button id="shuffleBtn" class="control-btn h-11 w-11 rounded-full bg-white text-slate-500 shadow-sm" aria-label="Shuffle">⤨</button>
+            <button id="prevBtn" class="control-btn h-12 w-12 rounded-full bg-white text-slate-700 shadow-sm text-xl" aria-label="Previous">⏮</button>
+            <button id="playBtn" class="control-btn play-btn h-16 w-16 rounded-full shadow-md text-2xl font-bold" aria-label="Play">▶</button>
+            <button id="nextBtn" class="control-btn h-12 w-12 rounded-full bg-white text-slate-700 shadow-sm text-xl" aria-label="Next">⏭</button>
+            <button id="muteBtn" class="control-btn h-11 w-11 rounded-full bg-white text-slate-500 shadow-sm" aria-label="Mute">🔊</button>
+          </div>
+
+          <div class="mt-6 flex items-center gap-3">
+            <span class="text-xs">🔈</span>
+            <input id="volume" type="range" min="0" max="1" step=".01" value=".85"
+                   class="w-full accent-indigo-500" aria-label="Volume">
+            <span class="text-xs">🔊</span>
+          </div>
+        </div>
+
+        <!-- AJAX Playlist -->
+        <div class="mt-7 border-t border-slate-200/70 pt-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-slate-800">Playlist</h3>
+            <button id="reloadBtn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">Reload</button>
+          </div>
+          <div id="playlist" class="max-h-56 overflow-y-auto hide-scrollbar space-y-1"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+/*
+  BLOGGER SETUP
+  -------------
+  1. Replace the demo tracks below with your MP3 URLs.
+  2. Replace cover URLs with your album artwork.
+  3. For true AJAX loading, create playlist.json on a CORS-enabled host
+     and set PLAYLIST_URL to that file.
+*/
+
+const PLAYLIST_URL = ""; // Example: "https://yourdomain.com/playlist.json"
+
+/* Demo data used automatically when PLAYLIST_URL is empty. */
+const DEMO_PLAYLIST = [
+  {
+    title: "Bewajah",
+    artist: "Himesh Reshammiya",
+    album: "Demo Collection",
+    cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=900&q=85",
+    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  },
+  {
+    title: "Midnight Dreams",
+    artist: "Digital Artist",
+    album: "Night Collection",
+    cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=85",
+    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+  },
+  {
+    title: "Ocean Lights",
+    artist: "Digital Artist",
+    album: "Chill Collection",
+    cover: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=900&q=85",
+    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+  }
+];
+
+const audio = document.getElementById("audio");
+const cover = document.getElementById("cover");
+const titleEl = document.getElementById("title");
+const artistEl = document.getElementById("artist");
+const durationEl = document.getElementById("duration");
+const currentTimeEl = document.getElementById("currentTime");
+const progressTrack = document.getElementById("progressTrack");
+const progressFill = document.getElementById("progressFill");
+const playBtn = document.getElementById("playBtn");
+const volume = document.getElementById("volume");
+const muteBtn = document.getElementById("muteBtn");
+const playlistEl = document.getElementById("playlist");
+const trackNumberEl = document.getElementById("trackNumber");
+const albumWrap = document.getElementById("albumWrap");
+const equalizer = document.getElementById("equalizer");
+
+let tracks = [];
+let currentIndex = 0;
+let shuffle = false;
+let liked = false;
+
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return "00:00";
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60).toString().padStart(2, "0");
+  return `${min}:${sec}`;
+}
+
+function setPlayingUI(playing) {
+  playBtn.textContent = playing ? "❚❚" : "▶";
+  albumWrap.classList.toggle("playing", playing);
+  equalizer.classList.toggle("playing", playing);
+}
+
+function renderPlaylist() {
+  playlistEl.innerHTML = tracks.map((track, index) => `
+    <button data-index="${index}"
+      class="playlist-item w-full text-left flex items-center gap-3 p-2.5 rounded-2xl ${index === currentIndex ? "active" : ""}">
+      <img src="${track.cover}" class="h-11 w-11 rounded-xl object-cover shrink-0" alt="">
+      <span class="min-w-0 flex-1">
+        <span class="block font-semibold text-sm text-slate-800 truncate">${escapeHtml(track.title)}</span>
+        <span class="block text-xs text-slate-400 truncate">${escapeHtml(track.artist)}</span>
+      </span>
+      <span class="text-xs text-slate-400">${index === currentIndex && !audio.paused ? "♪" : "▶"}</span>
+    </button>
+  `).join("");
+
+  playlistEl.querySelectorAll("[data-index]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      loadTrack(Number(btn.dataset.index), true);
+    });
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[ch]));
+}
+
+function updateTrackInfo() {
+  const track = tracks[currentIndex];
+  if (!track) return;
+
+  titleEl.textContent = track.title || "Untitled";
+  artistEl.textContent = track.artist || "Unknown Artist";
+  cover.src = track.cover || "";
+  cover.alt = `${track.title || "Album"} artwork`;
+  trackNumberEl.textContent = `Track ${currentIndex + 1} of ${tracks.length}`;
+  currentTimeEl.textContent = "00:00";
+  durationEl.textContent = "00:00";
+  progressFill.style.width = "0%";
+  renderPlaylist();
+}
+
+function loadTrack(index, autoplay = false) {
+  if (!tracks.length) return;
+
+  currentIndex = (index + tracks.length) % tracks.length;
+  const track = tracks[currentIndex];
+
+  audio.src = track.src;
+  audio.load();
+  updateTrackInfo();
+
+  if (autoplay) {
+    audio.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+  } else {
+    setPlayingUI(false);
+  }
+}
+
+async function loadPlaylist() {
+  playlistEl.innerHTML = `
+    <div class="py-5 text-center text-sm text-slate-400">
+      Loading playlist...
+    </div>
+  `;
+
+  try {
+    if (PLAYLIST_URL) {
+      const response = await fetch(PLAYLIST_URL, {
+        method: "GET",
+        cache: "no-store"
+      });
+
+      if (!response.ok) throw new Error("Playlist request failed");
+      const data = await response.json();
+
+      if (!Array.isArray(data)) throw new Error("Playlist JSON must be an array");
+      tracks = data;
+    } else {
+      // Demonstrates AJAX-style asynchronous loading without an external file.
+      tracks = await new Promise(resolve => {
+        setTimeout(() => resolve(DEMO_PLAYLIST), 450);
+      });
+    }
+
+    currentIndex = 0;
+    loadTrack(0, false);
+  } catch (error) {
+    console.error(error);
+    playlistEl.innerHTML = `
+      <div class="rounded-2xl bg-red-50 text-red-600 p-4 text-sm">
+        Unable to load playlist. Check your JSON URL and CORS settings.
+      </div>
+    `;
+  }
+}
+
+playBtn.addEventListener("click", () => {
+  if (!audio.src) return;
+
+  if (audio.paused) {
+    audio.play().then(() => {
+      setPlayingUI(true);
+      renderPlaylist();
+    }).catch(console.error);
+  } else {
+    audio.pause();
+    setPlayingUI(false);
+    renderPlaylist();
+  }
+});
+
+prevBtn.addEventListener("click", () => {
+  loadTrack(currentIndex - 1, true);
+});
+
+nextBtn.addEventListener("click", () => {
+  if (shuffle && tracks.length > 1) {
+    let next;
+    do { next = Math.floor(Math.random() * tracks.length); }
+    while (next === currentIndex);
+    loadTrack(next, true);
+  } else {
+    loadTrack(currentIndex + 1, true);
+  }
+});
+
+shuffleBtn.addEventListener("click", () => {
+  shuffle = !shuffle;
+  shuffleBtn.classList.toggle("text-indigo-600", shuffle);
+  shuffleBtn.classList.toggle("bg-indigo-50", shuffle);
+});
+
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.textContent = audio.muted ? "🔇" : "🔊";
+});
+
+volume.addEventListener("input", () => {
+  audio.volume = Number(volume.value);
+  audio.muted = false;
+  muteBtn.textContent = "🔊";
+});
+
+likeBtn.addEventListener("click", () => {
+  liked = !liked;
+  likeBtn.textContent = liked ? "♥" : "♡";
+  likeBtn.classList.toggle("text-pink-500", liked);
+});
+
+progressTrack.addEventListener("click", event => {
+  if (!audio.duration) return;
+  const rect = progressTrack.getBoundingClientRect();
+  const percent = (event.clientX - rect.left) / rect.width;
+  audio.currentTime = percent * audio.duration;
+});
+
+audio.addEventListener("loadedmetadata", () => {
+  durationEl.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progressFill.style.width = `${percent}%`;
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+});
+
+audio.addEventListener("play", () => {
+  setPlayingUI(true);
+  renderPlaylist();
+});
+
+audio.addEventListener("pause", () => {
+  setPlayingUI(false);
+  renderPlaylist();
+});
+
+audio.addEventListener("ended", () => {
+  if (shuffle && tracks.length > 1) {
+    let next;
+    do { next = Math.floor(Math.random() * tracks.length); }
+    while (next === currentIndex);
+    loadTrack(next, true);
+  } else {
+    loadTrack(currentIndex + 1, true);
+  }
+});
+
+audio.addEventListener("error", () => {
+  console.warn("Audio source could not be loaded:", audio.src);
+});
+
+reloadBtn.addEventListener("click", loadPlaylist);
+
+/* Keyboard controls */
+document.addEventListener("keydown", event => {
+  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+
+  if (event.code === "Space") {
+    event.preventDefault();
+    playBtn.click();
+  }
+  if (event.code === "ArrowRight") {
+    audio.currentTime = Math.min((audio.currentTime || 0) + 5, audio.duration || Infinity);
+  }
+  if (event.code === "ArrowLeft") {
+    audio.currentTime = Math.max((audio.currentTime || 0) - 5, 0);
+  }
+  if (event.code === "ArrowUp") {
+    event.preventDefault();
+    volume.value = Math.min(Number(volume.value) + .05, 1);
+    audio.volume = Number(volume.value);
+  }
+  if (event.code === "ArrowDown") {
+    event.preventDefault();
+    volume.value = Math.max(Number(volume.value) - .05, 0);
+    audio.volume = Number(volume.value);
+  }
+});
+
+audio.volume = .85;
+loadPlaylist();
+</script>
+</body>
+</html>
