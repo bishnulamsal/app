@@ -35,6 +35,13 @@
     "tag": "Global TV, Online TV"
   },
   {
+    "title": "AJAX Music Player - Blogger",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/music-player.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Advanced Blogger Thumbnail Generator",
     "desc": "One click post thumbnail generator for blogger.",
     "url": "tools/post-thumbnail-generator.html",
