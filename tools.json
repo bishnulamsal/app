@@ -36,10 +36,10 @@
   },
   {
     "title": "AJAX Music Player - Blogger",
-    "desc": "Fast and lightweight client-side web application.",
+    "desc": "AJAX Music Player - Blogger.",
     "url": "tools/music-player.html",
-    "icon": "⚡",
-    "tag": "Utility"
+    "icon": "♬",
+    "tag": "Music Player"
   },
   {
     "title": "Advanced Blogger Thumbnail Generator",
