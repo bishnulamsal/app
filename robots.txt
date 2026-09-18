@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://pdf.bishnulamsal.com.np/sitemap.xml

@@ -1,1 +1,0 @@
-self.onmessage=e=>self.postMessage({id:e.data.id,ok:true});
