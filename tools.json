@@ -7,6 +7,13 @@
     "tag": "ChatGPT"
   },
   {
+    "title": "Compress PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/compress-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Photography Live Simulator",
     "desc": "Photography Live Simulator · All effects rendered on real photo · No data collected.",
     "url": "tools/depth-of-field-simulator.html",
@@ -14,11 +21,25 @@
     "tag": "Photography"
   },
   {
+    "title": "Edit PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/edit-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Dork Search - Search Everything",
     "desc": "Fast client-side file, movie, pdf, and everything dork search.",
     "url": "tools/everything-search.html",
     "icon": "🔎",
     "tag": "Search"
+  },
+  {
+    "title": "HTML to PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/html-to-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
   },
   {
     "title": "Page Not Found - Redirecting...",
@@ -35,11 +56,60 @@
     "tag": "Global TV, Online TV"
   },
   {
+    "title": "JPG to PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/jpg-to-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "Merge PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/merge-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "AJAX Music Player - Blogger",
     "desc": "AJAX Music Player - Blogger.",
     "url": "tools/music-player.html",
     "icon": "🎵",
     "tag": "Music Player"
+  },
+  {
+    "title": "Organize PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/organize-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "Page Numbers — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/page-numbers.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "PDF to JPG — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/pdf-to-jpg.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "PDF to PNG — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/pdf-to-png.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "PDF to Word-ish — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/pdf-to-word.html",
+    "icon": "⚡",
+    "tag": "Utility"
   },
   {
     "title": "Advanced Blogger Thumbnail Generator",
@@ -56,11 +126,46 @@
     "tag": "Converter"
   },
   {
+    "title": "Protect PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/protect-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
     "title": "Roman ⇄ Unicode — नेपाली फन्ट कन्भर्टर",
     "desc": "Fast client-side Roman to Unicode Romanized Nepali text converter.",
     "url": "tools/roman-to-unicode-converter.html",
     "icon": "⇄",
     "tag": "Unicode to Roman"
+  },
+  {
+    "title": "Rotate PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/rotate-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "Sign PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/sign-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "Split PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/split-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "Stamp PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/stamp-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
   },
   {
     "title": "Text to Voice Converter",
@@ -75,5 +180,19 @@
     "url": "tools/unicode-to-preeti-converter.html",
     "icon": "⇄",
     "tag": "Unicode to Preeti"
+  },
+  {
+    "title": "Unlock PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/unlock-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
+  },
+  {
+    "title": "Watermark PDF — PDF Tools",
+    "desc": "Fast and lightweight client-side web application.",
+    "url": "tools/watermark-pdf.html",
+    "icon": "⚡",
+    "tag": "Utility"
   }
 ]
